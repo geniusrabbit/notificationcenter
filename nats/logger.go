@@ -8,11 +8,13 @@ package nats
 import (
 	"encoding/json"
 
+	"github.com/geniusrabbit/notificationcenter/subscriber"
 	"github.com/nats-io/nats"
 )
 
-// Log for nats queue
+// Log for NATS queue
 type Log struct {
+	subscriber.Base
 	topics []string
 	conn   *nats.Conn
 }
@@ -28,8 +30,8 @@ func NewLog(topics []string, url string, options ...nats.Option) (*Log, error) {
 }
 
 // MustNewLog object
-func MustNewLog(url string, options ...nats.Option) *Log {
-	var log, err = NewLog(url, options...)
+func MustNewLog(topics []string, url string, options ...nats.Option) *Log {
+	var log, err = NewLog(topics, url, options...)
 	if nil != err || nil == log {
 		panic(err)
 	}

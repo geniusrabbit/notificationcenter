@@ -8,7 +8,7 @@ package subscriber
 import (
 	"io"
 
-	"bitbucket.org/geniusrabbit/corelib/notificationcenter"
+	"github.com/geniusrabbit/notificationcenter"
 )
 
 // Base struct
