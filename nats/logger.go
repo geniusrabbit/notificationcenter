@@ -12,26 +12,26 @@ import (
 	"github.com/nats-io/nats"
 )
 
-// Log for NATS queue
-type Log struct {
+// Logger for NATS queue
+type Logger struct {
 	subscriber.Base
 	topics []string
 	conn   *nats.Conn
 }
 
-// NewLog object
-func NewLog(topics []string, url string, options ...nats.Option) (*Log, error) {
+// NewLogger object
+func NewLogger(topics []string, url string, options ...nats.Option) (*Logger, error) {
 	var conn, err = nats.Connect(url, options...)
 	if nil != err || nil == conn {
 		return nil, err
 	}
 
-	return &Log{topics: topics, conn: conn}, nil
+	return &Logger{topics: topics, conn: conn}, nil
 }
 
-// MustNewLog object
-func MustNewLog(topics []string, url string, options ...nats.Option) *Log {
-	var log, err = NewLog(topics, url, options...)
+// MustNewLogger object
+func MustNewLogger(topics []string, url string, options ...nats.Option) *Logger {
+	var log, err = NewLogger(topics, url, options...)
 	if nil != err || nil == log {
 		panic(err)
 	}
@@ -52,7 +52,7 @@ func (l *Logger) Write(data []byte) (err error) {
 }
 
 // Send message
-func (l *Log) Send(messages ...interface{}) (err error) {
+func (l *Logger) Send(messages ...interface{}) (err error) {
 	if nil != messages {
 		for _, it := range messages {
 			if b, err := json.Marshal(it); nil == err {
@@ -67,7 +67,7 @@ func (l *Log) Send(messages ...interface{}) (err error) {
 }
 
 // Close nats client
-func (l *Log) Close() error {
+func (l *Logger) Close() error {
 	if nil != l.conn {
 		l.conn.Close()
 		l.conn = nil
