@@ -5,7 +5,10 @@
 
 package notificationcenter
 
-import "io"
+import (
+	"io"
+	"sync"
+)
 
 var (
 	loggers         = map[string]Logger{}
@@ -93,6 +96,26 @@ func Send(name string, msg ...interface{}) error {
 		return l.Send(msg...)
 	}
 	return ErrInvalidObject
+}
+
+// Listen subscribers
+func Listen() (err error) {
+	if nil == subscribers {
+		return nil
+	}
+
+	var w sync.WaitGroup
+
+	for _, sub := range subscribers {
+		w.Add(1)
+		go func() {
+			err = sub.Listen()
+			w.Done()
+		}()
+	}
+
+	w.Wait()
+	return
 }
 
 // Close notification center
