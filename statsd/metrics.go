@@ -22,11 +22,11 @@ type (
 )
 
 // StatsD client
-type StatsD *statsd.Client
+type StatsD statsd.Client
 
 // NewUDP makes statsd instance with specific params
 func NewUDP(addr string, opts ...statsd.Option) (*StatsD, error) {
-	options := statsd.Option{
+	options := []statsd.Option{
 		statsd.Address(addr),
 		statsd.Network("udp"),
 	}
@@ -36,10 +36,7 @@ func NewUDP(addr string, opts ...statsd.Option) (*StatsD, error) {
 	}
 
 	c, err := statsd.New(options...)
-	if err != nil {
-		return nil, err
-	}
-	return (*StatsD)(c), nil
+	return (*StatsD)(c), err
 }
 
 // Send creates request with metrics
@@ -52,16 +49,20 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 		case string:
 			s.client().Increment(msg)
 		case []string:
-			for _, s := range msg {
-				s.client().Increment(s)
+			for _, m := range msg {
+				s.client().Increment(m)
 			}
-		case map[string]int, TypeCount:
+		case map[string]int:
 			for bucket, count := range msg {
-				s.client.Count(bucket, count)
+				s.client().Count(bucket, count)
+			}
+		case TypeCount:
+			for bucket, count := range msg {
+				s.client().Count(bucket, count)
 			}
 		case map[string]func() error:
 			for bucket, handler := range msg {
-				t := s.client.NewTiming()
+				t := s.client().NewTiming()
 				if err = handler(); err != nil {
 					break
 				}
@@ -69,19 +70,23 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 			}
 		case TypeTiming:
 			for bucket, duration := range msg {
-				s.client.Timing(bucket, duration)
+				s.client().Timing(bucket, duration)
 			}
 		case map[string]time.Duration:
 			for bucket, duration := range msg {
-				s.client.Timing(bucket, int(duration/time.Millisecond))
+				s.client().Timing(bucket, int(duration/time.Millisecond))
 			}
 		case TypeGauge:
 			for bucket, value := range msg {
-				s.client.Gauge(bucket, value)
+				s.client().Gauge(bucket, value)
 			}
-		case map[string]string, TypeUnique:
+		case map[string]string:
 			for bucket, value := range msg {
-				s.client.Unique(bucket, value)
+				s.client().Unique(bucket, value)
+			}
+		case TypeUnique:
+			for bucket, value := range msg {
+				s.client().Unique(bucket, value)
 			}
 		default:
 			err = fmt.Errorf("Unexpected type of metric: %s", m)
@@ -101,5 +106,5 @@ func (s *StatsD) Close() {
 ///////////////////////////////////////////////////////////////////////////////
 
 func (s *StatsD) client() *statsd.Client {
-	return s.(*statsd.Client)
+	return (*statsd.Client)(s)
 }

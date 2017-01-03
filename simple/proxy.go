@@ -30,7 +30,7 @@ func (e *EventProxy) Send(msg ...interface{}) (err error) {
 }
 
 // Listen process
-func (s *Simple) Listen() error {
+func (e *EventProxy) Listen() error {
 	return nil
 }
 
