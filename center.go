@@ -1,11 +1,12 @@
 //
-// @project geniusrabbit.com 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016
+// @project geniusrabbit.com 2016 – 2017
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017
 //
 
 package notificationcenter
 
 import (
+	"fmt"
 	"io"
 	"sync"
 )
@@ -96,6 +97,22 @@ func Send(name string, msg ...interface{}) error {
 		return l.Send(msg...)
 	}
 	return ErrInvalidObject
+}
+
+// Subscribe new handler
+func Subscribe(name string, h Handler) error {
+	if sub, _ := subscribers[name]; nil != sub {
+		return sub.Subscribe(h)
+	}
+	return fmt.Errorf("Undefined subscriber with name: %s", name)
+}
+
+// Unsubscribe this handler by ptr
+func Unsubscribe(name string, h Handler) error {
+	if sub, _ := subscribers[name]; nil != sub {
+		return sub.Unsubscribe(h)
+	}
+	return fmt.Errorf("Undefined subscriber with name: %s", name)
 }
 
 // Listen subscribers
