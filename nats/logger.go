@@ -72,4 +72,5 @@ func (l *Logger) Close() error {
 		l.conn.Close()
 		l.conn = nil
 	}
+	return nil
 }
