@@ -6,31 +6,38 @@
 package nats
 
 import (
-	"github.com/geniusrabbit/notificationcenter/subscriber"
 	"github.com/nats-io/nats"
+
+	"github.com/geniusrabbit/notificationcenter/subscriber"
 )
 
 // Subscriber for NATS queue
 type Subscriber struct {
 	subscriber.Base
+	group      string
 	topics     []string
 	conn       *nats.Conn
 	closeEvent chan bool
 }
 
 // NewSubscriber object
-func NewSubscriber(topics []string, url string, options ...nats.Option) (*Subscriber, error) {
+func NewSubscriber(url, group string, topics []string, options ...nats.Option) (*Subscriber, error) {
 	var conn, err = nats.Connect(url, options...)
 	if nil != err || nil == conn {
 		return nil, err
 	}
 
-	return &Subscriber{topics: topics, conn: conn, closeEvent: make(chan bool, 1)}, nil
+	return &Subscriber{
+		group:      group,
+		topics:     topics,
+		conn:       conn,
+		closeEvent: make(chan bool, 1),
+	}, nil
 }
 
 // MustNewSubscriber object
-func MustNewSubscriber(topics []string, url string, options ...nats.Option) *Subscriber {
-	var sub, err = NewSubscriber(topics, url, options...)
+func MustNewSubscriber(url, group string, topics []string, options ...nats.Option) *Subscriber {
+	var sub, err = NewSubscriber(url, group, topics, options...)
 	if nil != err || nil == sub {
 		panic(err)
 	}
@@ -40,7 +47,11 @@ func MustNewSubscriber(topics []string, url string, options ...nats.Option) *Sub
 // Listen kafka consumer
 func (s *Subscriber) Listen() (_ error) {
 	for _, topic := range s.topics {
-		s.conn.Subscribe(topic, s.message)
+		if s.group != "" {
+			s.conn.QueueSubscribe(topic, s.group, s.message)
+		} else {
+			s.conn.Subscribe(topic, s.message)
+		}
 	}
 	<-s.closeEvent
 	return
