@@ -1,12 +1,13 @@
 //
-// @project geniusrabbit.com 2015
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015
+// @project geniusrabbit.com 2015 – 2017
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2017
 //
 
 package subscriber
 
 import (
 	"io"
+	"reflect"
 
 	"github.com/geniusrabbit/notificationcenter"
 )
@@ -22,7 +23,7 @@ func (s *Base) Subscribe(h notificationcenter.Handler) error {
 		s.handlers = make([]notificationcenter.Handler, 0, 10)
 	} else {
 		for _, H := range s.handlers {
-			if H == h {
+			if reflect.ValueOf(H).Pointer() == reflect.ValueOf(h).Pointer() {
 				return nil
 			}
 		} // end for
@@ -35,7 +36,7 @@ func (s *Base) Subscribe(h notificationcenter.Handler) error {
 func (s *Base) Unsubscribe(h notificationcenter.Handler) error {
 	if nil != s.handlers {
 		for i, H := range s.handlers {
-			if H == h {
+			if reflect.ValueOf(H).Pointer() == reflect.ValueOf(h).Pointer() {
 				s.handlers = append(s.handlers[i:], s.handlers[:i+1]...)
 				break
 			}
