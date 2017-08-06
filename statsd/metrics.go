@@ -15,7 +15,7 @@ import (
 // Metric types
 type (
 	TypeIncrement []string
-	TypeGauge     map[string]int
+	TypeGauge     map[string]interface{}
 	TypeTiming    map[string]int
 	TypeCount     map[string]int
 	TypeUnique    map[string]string
