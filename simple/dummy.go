@@ -1,6 +1,6 @@
 //
-// @project GeniusRabbit 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016
+// @project GeniusRabbit 2016 - 2017
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 - 2017
 //
 
 package simple
@@ -23,8 +23,18 @@ func NewDummy() *Dummy {
 }
 
 // Send message
-func (e *Dummy) Send(msg ...interface{}) error {
-	log.Println("[DUMMY]", strings.TrimSpace(fmt.Sprintln(msg...)))
+func (e *Dummy) Send(messages ...interface{}) (err error) {
+	for _, m := range messages {
+		switch msg := m.(type) {
+		case map[string]func() error:
+			for bucket, handler := range msg {
+				err = handler()
+				log.Println("[DUMMY]", bucket, err)
+			}
+		default:
+			log.Println("[DUMMY]", strings.TrimSpace(fmt.Sprintln(messages...)))
+		}
+	}
 	return nil
 }
 
