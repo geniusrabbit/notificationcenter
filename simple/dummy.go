@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/geniusrabbit/notificationcenter"
 )
@@ -28,8 +29,9 @@ func (e *Dummy) Send(messages ...interface{}) (err error) {
 		switch msg := m.(type) {
 		case map[string]func() error:
 			for bucket, handler := range msg {
+				t := time.Now()
 				err = handler()
-				log.Println("[DUMMY]", bucket, err)
+				log.Println("[DUMMY]", bucket, time.Since(t), err)
 			}
 		default:
 			log.Println("[DUMMY]", strings.TrimSpace(fmt.Sprintln(messages...)))

@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016
+// @project geniusrabbit::notificationcenter 2017
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2017
 //
 
 package statsd
@@ -10,37 +10,37 @@ import (
 	"time"
 
 	statsd "gopkg.in/alexcesaro/statsd.v2"
-)
 
-// Metric types
-type (
-	TypeIncrement []string
-	TypeGauge     map[string]interface{}
-	TypeTiming    map[string]int
-	TypeCount     map[string]int
-	TypeUnique    map[string]string
+	"github.com/geniusrabbit/notificationcenter"
+	"github.com/geniusrabbit/notificationcenter/metrics"
 )
 
 // StatsD client
 type StatsD statsd.Client
 
 // NewUDP makes statsd instance with specific params
-func NewUDP(addr string, opts ...statsd.Option) (*StatsD, error) {
-	options := []statsd.Option{
-		statsd.Address(addr),
-		statsd.Network("udp"),
-	}
+func NewUDP(addr string, format metrics.Formater, opts ...statsd.Option) (notificationcenter.Logger, error) {
+	var (
+		options = []statsd.Option{
+			statsd.Address(addr),
+			statsd.Network("udp"),
+		}
+	)
 
 	if len(opts) > 0 {
 		options = append(options, opts...)
 	}
 
 	c, err := statsd.New(options...)
-	return (*StatsD)(c), err
+	if err != nil {
+		return nil, err
+	}
+
+	return metrics.NewWrapper((*StatsD)(c), format), err
 }
 
-// Send creates request with metrics
-func (s *StatsD) Send(messages ...interface{}) (err error) {
+// SendMetricas creates request with metrics
+func (s *StatsD) SendMetricas(messages ...interface{}) (err error) {
 	// Working without panics
 	defer func() { recover() }()
 
@@ -56,7 +56,7 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 			for bucket, count := range msg {
 				s.client().Count(bucket, count)
 			}
-		case TypeCount:
+		case metrics.TypeCount:
 			for bucket, count := range msg {
 				s.client().Count(bucket, count)
 			}
@@ -68,7 +68,7 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 				}
 				t.Send(bucket)
 			}
-		case TypeTiming:
+		case metrics.TypeTiming:
 			for bucket, duration := range msg {
 				s.client().Timing(bucket, duration)
 			}
@@ -76,7 +76,7 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 			for bucket, duration := range msg {
 				s.client().Timing(bucket, int(duration/time.Millisecond))
 			}
-		case TypeGauge:
+		case metrics.TypeGauge:
 			for bucket, value := range msg {
 				s.client().Gauge(bucket, value)
 			}
@@ -84,7 +84,7 @@ func (s *StatsD) Send(messages ...interface{}) (err error) {
 			for bucket, value := range msg {
 				s.client().Unique(bucket, value)
 			}
-		case TypeUnique:
+		case metrics.TypeUnique:
 			for bucket, value := range msg {
 				s.client().Unique(bucket, value)
 			}
