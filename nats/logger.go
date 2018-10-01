@@ -1,6 +1,6 @@
 //
-// @project GeniusRabbit 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016
+// @project GeniusRabbit 2016 - 2018
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 - 2018
 //
 
 package nats
@@ -22,7 +22,7 @@ type Logger struct {
 // NewLogger object
 func NewLogger(topics []string, url string, options ...nats.Option) (*Logger, error) {
 	var conn, err = nats.Connect(url, options...)
-	if nil != err || nil == conn {
+	if err != nil || conn == nil {
 		return nil, err
 	}
 
@@ -32,7 +32,7 @@ func NewLogger(topics []string, url string, options ...nats.Option) (*Logger, er
 // MustNewLogger object
 func MustNewLogger(topics []string, url string, options ...nats.Option) *Logger {
 	var log, err = NewLogger(topics, url, options...)
-	if nil != err || nil == log {
+	if err != nil || log == nil {
 		panic(err)
 	}
 	return log
@@ -41,10 +41,10 @@ func MustNewLogger(topics []string, url string, options ...nats.Option) *Logger 
 // Write binary message
 func (l *Logger) Write(data []byte) (err error) {
 	for _, t := range l.topics {
-		if nil == l.conn {
+		if l.conn == nil {
 			break
 		}
-		if err = l.conn.Publish(t, data); nil == err {
+		if err = l.conn.Publish(t, data); err == nil {
 			break
 		}
 	}
@@ -53,14 +53,12 @@ func (l *Logger) Write(data []byte) (err error) {
 
 // Send message
 func (l *Logger) Send(messages ...interface{}) (err error) {
-	if nil != messages {
-		for _, it := range messages {
-			if b, err := json.Marshal(it); nil == err {
-				err = l.Write(b)
-			}
-			if nil != err {
-				break
-			}
+	for _, it := range messages {
+		if b, err := json.Marshal(it); err == nil {
+			err = l.Write(b)
+		}
+		if err != nil {
+			break
 		}
 	}
 	return
@@ -68,7 +66,7 @@ func (l *Logger) Send(messages ...interface{}) (err error) {
 
 // Close nats client
 func (l *Logger) Close() error {
-	if nil != l.conn {
+	if l.conn != nil {
 		l.conn.Close()
 		l.conn = nil
 	}

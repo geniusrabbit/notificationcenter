@@ -1,6 +1,6 @@
 //
-// @project GeniusRabbit 2016 – 2017
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017
+// @project GeniusRabbit 2016 – 2018
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2018
 //
 
 package nats
@@ -23,7 +23,7 @@ type Subscriber struct {
 // NewSubscriber object
 func NewSubscriber(url, group string, topics []string, options ...nats.Option) (*Subscriber, error) {
 	var conn, err = nats.Connect(url, options...)
-	if nil != err || nil == conn {
+	if err != nil || conn == nil {
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func NewSubscriber(url, group string, topics []string, options ...nats.Option) (
 // MustNewSubscriber object
 func MustNewSubscriber(url, group string, topics []string, options ...nats.Option) *Subscriber {
 	var sub, err = NewSubscriber(url, group, topics, options...)
-	if nil != err || nil == sub {
+	if err != nil || sub == nil {
 		panic(err)
 	}
 	return sub
@@ -64,7 +64,7 @@ func (s *Subscriber) message(m *nats.Msg) {
 
 // Close nats client
 func (s *Subscriber) Close() error {
-	if nil != s.conn {
+	if s.conn != nil {
 		s.conn.Close()
 		s.conn = nil
 		s.closeEvent <- true
