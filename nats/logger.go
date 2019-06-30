@@ -1,6 +1,6 @@
 //
-// @project GeniusRabbit 2016 - 2018
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 - 2018
+// @project GeniusRabbit 2016 - 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 - 2019
 //
 
 package nats
@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 
 	"github.com/geniusrabbit/notificationcenter/subscriber"
-	"github.com/nats-io/nats"
+	nats "github.com/nats-io/nats.go"
 )
 
 // Logger for NATS queue

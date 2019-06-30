@@ -1,6 +1,6 @@
 //
-// @project GeniusRabbit 2018
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2018
+// @project GeniusRabbit 2018 - 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2018 - 2019
 //
 
 package nats
@@ -10,7 +10,7 @@ import (
 	"errors"
 
 	"github.com/geniusrabbit/notificationcenter/subscriber"
-	nstream "github.com/nats-io/go-nats-streaming"
+	nstream "github.com/nats-io/stan.go"
 )
 
 // Error set
