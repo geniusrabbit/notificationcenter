@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2016 – 2017
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017
+// @project geniusrabbit.com 2016 – 2017, 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017, 2019
 //
 
 package notificationcenter
@@ -12,15 +12,15 @@ import (
 )
 
 var (
-	loggers         = map[string]Logger{}
+	streamers       = map[string]Streamer{}
 	subscribers     = map[string]Subscriber{}
 	closeEvent      = make(chan bool, 1000)
 	closeEventCount int
 )
 
-// LoggerByName interface
-func LoggerByName(name string) Logger {
-	l, _ := loggers[name]
+// StreamByName returns streamer interface by codename if exists
+func StreamByName(name string) Streamer {
+	l, _ := streamers[name]
 	return l
 }
 
@@ -30,16 +30,17 @@ func SubscriberByName(name string) Subscriber {
 	return s
 }
 
-// Register logger/subscriber
+// Register the new streamer or subscriber interface to future using
+// Object can implement both interface and process all events from start to end
 func Register(name string, elem ...interface{}) error {
 	for _, el := range elem {
 		var registered bool
 
-		if logger, ok := el.(Logger); ok {
-			if _, ok := loggers[name]; ok {
+		if logger, ok := el.(Streamer); ok {
+			if _, ok := streamers[name]; ok {
 				return ErrInterfaceAlreadySubscribed
 			}
-			loggers[name] = logger
+			streamers[name] = logger
 			registered = true
 		}
 
@@ -58,12 +59,12 @@ func Register(name string, elem ...interface{}) error {
 	return nil
 }
 
-// Unregister logger/subscriber object
+// Unregister exist streamer or subscriber interface from the global storage
 func Unregister(elem ...interface{}) error {
 	for _, el := range elem {
-		for k, i := range loggers {
+		for k, i := range streamers {
 			if i == el {
-				delete(loggers, k)
+				delete(streamers, k)
 			}
 		}
 		for k, i := range subscribers {
@@ -75,13 +76,13 @@ func Unregister(elem ...interface{}) error {
 	return nil
 }
 
-// UnregisterAllByName logger/subscriber
-func UnregisterAllByName(name string, _loggers, _subscribers bool) {
-	if i, ok := loggers[name]; ok && _loggers {
+// UnregisterAllByName exist streamer or subscriber interface from the global storage
+func UnregisterAllByName(name string, _streamers, _subscribers bool) {
+	if i, ok := streamers[name]; ok && _streamers {
 		if cl, ok := i.(io.Closer); ok {
 			cl.Close()
 		}
-		delete(loggers, name)
+		delete(streamers, name)
 	}
 	if i, ok := subscribers[name]; ok && _subscribers {
 		if cl, ok := i.(io.Closer); ok {
@@ -91,15 +92,15 @@ func UnregisterAllByName(name string, _loggers, _subscribers bool) {
 	}
 }
 
-// Send message
+// Send message object to the stream by name
 func Send(name string, msg ...interface{}) error {
-	if l, ok := loggers[name]; ok {
+	if l, ok := streamers[name]; ok {
 		return l.Send(msg...)
 	}
 	return ErrInvalidObject
 }
 
-// Subscribe new handler
+// Subscribe new handler on some paticular subscriber interface by name
 func Subscribe(name string, h Handler) error {
 	if sub, _ := subscribers[name]; nil != sub {
 		return sub.Subscribe(h)
@@ -107,7 +108,7 @@ func Subscribe(name string, h Handler) error {
 	return fmt.Errorf("Undefined subscriber with name: %s", name)
 }
 
-// Unsubscribe this handler by ptr
+// Unsubscribe some paticular handler interface from subscriber with the *name*
 func Unsubscribe(name string, h Handler) error {
 	if sub, _ := subscribers[name]; nil != sub {
 		return sub.Unsubscribe(h)
@@ -115,9 +116,9 @@ func Unsubscribe(name string, h Handler) error {
 	return fmt.Errorf("Undefined subscriber with name: %s", name)
 }
 
-// Listen subscribers
+// Listen runs subscribers listen interface
 func Listen() (err error) {
-	if nil == subscribers {
+	if subscribers == nil {
 		return nil
 	}
 
@@ -137,7 +138,7 @@ func Listen() (err error) {
 
 // Close notification center
 func Close() {
-	for _, i := range loggers {
+	for _, i := range streamers {
 		if cl, ok := i.(io.Closer); ok {
 			cl.Close()
 		}
@@ -154,7 +155,15 @@ func Close() {
 	}
 }
 
-// OnClose event
+// OnClose event will be executed only after closing all interfaces
+//
+// Usecases in the application makes subsribing for the finishing event very convinient
+// ```go
+// func myDatabaseObserver() {
+//   <- notificationcenter.OnClose()
+//   // ... Do something
+// }
+// ```
 func OnClose() <-chan bool {
 	closeEventCount++
 	return (<-chan bool)(closeEvent)

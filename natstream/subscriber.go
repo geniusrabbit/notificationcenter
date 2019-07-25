@@ -3,7 +3,7 @@
 // @author Dmitry Ponomarev <demdxx@gmail.com> 2018 - 2019
 //
 
-package nats
+package natstream
 
 import (
 	"github.com/geniusrabbit/notificationcenter/subscriber"
@@ -22,7 +22,7 @@ type Subscriber struct {
 
 // NewSubscriber object
 func NewSubscriber(url, clusterID, clientID, group string, topics []string, subOptions []nstream.Option, options ...nstream.Option) (*Subscriber, error) {
-	var conn, err = nstream.Connect(clusterID, clientID, url, options...)
+	var conn, err = nstream.Connect(clusterID, clientID, nstream.NatsURL(url), options...)
 	if err != nil || conn == nil {
 		return nil, err
 	}

@@ -34,7 +34,7 @@ type Subscriber struct {
 	consumer *consumergroup.ConsumerGroup
 }
 
-// NewSubscriber for kafka
+// NewSubscriber for kafka group subscriber
 func NewSubscriber(addrs []string, group string, topics []string) (*Subscriber, error) {
 	config := consumergroup.NewConfig()
 	config.Offsets.Initial = sarama.OffsetNewest
@@ -43,7 +43,7 @@ func NewSubscriber(addrs []string, group string, topics []string) (*Subscriber, 
 	return NewSubscriberByConfig(addrs, config, group, topics)
 }
 
-// NewSubscriberByConfig for kafka
+// NewSubscriberByConfig for kafka group subscriber
 func NewSubscriberByConfig(addrs []string, config *consumergroup.Config, group string, topics []string) (*Subscriber, error) {
 	consumer, err := consumergroup.JoinConsumerGroup(group, topics, addrs, config)
 	if err != nil {
@@ -63,12 +63,10 @@ func (s *Subscriber) Listen() (err error) {
 		case err := <-s.consumer.Errors():
 			log.Println(err)
 		case m := <-s.consumer.Messages():
-			if nil != s {
-				if err = s.Handle(m, false); nil != err {
-					break
-				}
-				s.consumer.CommitUpto(m)
+			if err = s.Handle(m, false); err != nil {
+				break
 			}
+			s.consumer.CommitUpto(m)
 		}
 	}
 	return
@@ -76,10 +74,9 @@ func (s *Subscriber) Listen() (err error) {
 
 // Close kafka consumer
 func (s *Subscriber) Close() (err error) {
-	if nil != s.consumer {
-		err = s.consumer.Close()
-		s.consumer = nil
+	if err = s.consumer.Close(); err != nil {
 		s.CloseAll()
+		return err
 	}
-	return
+	return s.CloseAll()
 }

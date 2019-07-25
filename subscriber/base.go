@@ -1,15 +1,22 @@
 //
-// @project geniusrabbit.com 2015 – 2017
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2017
+// @project geniusrabbit.com 2015 – 2017, 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2017, 2019
 //
 
 package subscriber
 
 import (
+	"errors"
 	"io"
 	"reflect"
 
 	"github.com/geniusrabbit/notificationcenter"
+)
+
+var (
+	errHandlerIsNotFound        = errors.New("[subscriber.base] handler is not found")
+	errInvalidHandler           = errors.New("[subscribe.base] invalid handler")
+	errHandlerAlreadyRegistered = errors.New("[subscribe.base] handler already registered")
 )
 
 // Base struct
@@ -19,42 +26,37 @@ type Base struct {
 
 // Subscribe new handler
 func (s *Base) Subscribe(h notificationcenter.Handler) error {
-	if nil == s.handlers {
-		s.handlers = make([]notificationcenter.Handler, 0, 10)
-	} else {
-		for _, H := range s.handlers {
-			if reflect.ValueOf(H).Pointer() == reflect.ValueOf(h).Pointer() {
-				return nil
-			}
-		} // end for
+	if h == nil {
+		return errInvalidHandler
+	}
+	for _, current := range s.handlers {
+		if reflect.ValueOf(current).Pointer() == reflect.ValueOf(h).Pointer() {
+			return errHandlerAlreadyRegistered
+		}
 	}
 	s.handlers = append(s.handlers, h)
 	return nil
 }
 
 // Unsubscribe some handler
-func (s *Base) Unsubscribe(h notificationcenter.Handler) error {
-	if nil != s.handlers {
-		for i, H := range s.handlers {
-			if reflect.ValueOf(H).Pointer() == reflect.ValueOf(h).Pointer() {
-				s.handlers = append(s.handlers[i:], s.handlers[:i+1]...)
-				break
-			}
-		} // end for
+func (s *Base) Unsubscribe(h notificationcenter.Handler) (err error) {
+	if h == nil {
+		return errInvalidHandler
 	}
-	return nil
+	for i, current := range s.handlers {
+		if reflect.ValueOf(current).Pointer() == reflect.ValueOf(h).Pointer() {
+			s.handlers = append(s.handlers[:i], s.handlers[i+1:]...)
+			return nil
+		}
+	}
+	return errHandlerIsNotFound
 }
 
-// Handle all handlers
-func (s *Base) Handle(item interface{}, stopIfError bool) (err error) {
-	if nil == s.handlers {
-		return
-	}
-
+// Handle process the message with list of handlers
+func (s *Base) Handle(msg notificationcenter.Message, stopIfError bool) (err error) {
 	for _, h := range s.handlers {
-		if e := h.Handle(item); nil != e {
-			err = e
-			if stopIfError {
+		if e := h.Handle(msg); e != nil {
+			if err = e; stopIfError {
 				break
 			}
 		}
@@ -62,16 +64,14 @@ func (s *Base) Handle(item interface{}, stopIfError bool) (err error) {
 	return
 }
 
-// CloseAll handlers
+// CloseAll handlers if io.Closer interface is implemented
 func (s *Base) CloseAll() (err error) {
-	if nil != s.handlers {
-		for _, h := range s.handlers {
-			if fn, ok := h.(io.Closer); ok {
-				err = fn.Close()
-			}
-			if nil != err {
-				break
-			}
+	for _, h := range s.handlers {
+		if fn, ok := h.(io.Closer); ok {
+			err = fn.Close()
+		}
+		if err != nil {
+			break
 		}
 	}
 	return

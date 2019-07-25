@@ -1,7 +1,8 @@
 //
-// @project geniusrabbit::notificationcenter 2017
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2017
+// @project geniusrabbit::notificationcenter 2017, 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2017, 2019
 //
+// DEPRECATED: Will be removed in the next iteration
 
 package statsd
 
@@ -19,7 +20,7 @@ import (
 type StatsD statsd.Client
 
 // NewUDP makes statsd instance with specific params
-func NewUDP(addr string, format metrics.Formater, opts ...statsd.Option) (notificationcenter.Logger, error) {
+func NewUDP(addr string, format metrics.Formater, opts ...statsd.Option) (notificationcenter.Streamer, error) {
 	var (
 		options = []statsd.Option{
 			statsd.Address(addr),
@@ -97,8 +98,8 @@ func (s *StatsD) SendMetricas(messages ...interface{}) (err error) {
 }
 
 // Close closes client connection
-func (s *StatsD) Close() {
-	s.client().Close()
+func (s *StatsD) Close() error {
+	return s.client().Close()
 }
 
 ///////////////////////////////////////////////////////////////////////////////

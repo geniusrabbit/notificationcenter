@@ -1,25 +1,20 @@
 //
-// @project geniusrabbit.com 2015 – 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016
+// @project geniusrabbit.com 2015 – 2016, 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019
 //
 
 package kafka
 
-type kafkaByteEncoder struct {
-	data []byte
+type kafkaByteEncoder []byte
+
+func (k kafkaByteEncoder) Encode() ([]byte, error) {
+	return k, nil
 }
 
-func (k *kafkaByteEncoder) Encode() ([]byte, error) {
-	return k.data, nil
+func (k kafkaByteEncoder) Length() int {
+	return len(k)
 }
 
-func (k *kafkaByteEncoder) Length() int {
-	if nil == k || nil == k.data {
-		return 0
-	}
-	return len(k.data)
-}
-
-func byteEncoder(data []byte) *kafkaByteEncoder {
-	return &kafkaByteEncoder{data: data}
+func byteEncoder(data []byte) kafkaByteEncoder {
+	return kafkaByteEncoder(data)
 }

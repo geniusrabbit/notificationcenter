@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2015 – 2016
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016
+// @project geniusrabbit.com 2015 – 2016, 2019
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019
 //
 
 package notificationcenter
@@ -11,15 +11,15 @@ import (
 
 // Handler interface
 type Handler interface {
-	Handle(item interface{}) error
+	Handle(msg Message) error
 }
 
 // FuncHandler type
-type FuncHandler func(item interface{}) error
+type FuncHandler func(msg Message) error
 
 // Handle this item
-func (f FuncHandler) Handle(item interface{}) error {
-	return f(item)
+func (f FuncHandler) Handle(msg Message) error {
+	return f(msg)
 }
 
 // MultithreadHandler it's ext interface
@@ -40,8 +40,8 @@ func (h multithread) Concurrently() int {
 }
 
 // Handle this item
-func (h multithread) Handle(item interface{}) error {
-	return h.handler.Handle(item)
+func (h multithread) Handle(msg Message) error {
+	return h.handler.Handle(msg)
 }
 
 // NewMultithreadHandler processor
