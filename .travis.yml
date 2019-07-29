@@ -3,6 +3,10 @@ language: go
 env:
   - COVERALLS_TOKEN=BFANJXd8QFVuXFQzOfm0KjqEVwtyBAAWo
 
+before:
+  hooks:
+    - go mod download
+
 matrix:
   include:
   - go: "1.12.x"
