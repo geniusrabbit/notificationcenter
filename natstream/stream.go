@@ -24,12 +24,12 @@ type Stream struct {
 	subscriber.Base
 	topic   string
 	encoder encoder.Encoder
-	conn    *nstream.Conn
+	conn    nstream.Conn
 }
 
 // NewStream of the NATS stream server
 func NewStream(url, clusterID, clientID, topic string, options ...nstream.Option) (*Stream, error) {
-	conn, err := nstream.Connect(clusterID, clientID, nstream.NatsURL(url), options...)
+	conn, err := nstream.Connect(clusterID, clientID, append(options, nstream.NatsURL(url))...)
 	if err != nil || conn == nil {
 		return nil, err
 	}

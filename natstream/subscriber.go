@@ -15,14 +15,14 @@ type Subscriber struct {
 	subscriber.Base
 	group      string
 	topics     []string
-	options    []nstream.Option
-	conn       *nstream.Conn
+	options    []nstream.SubscriptionOption
+	conn       nstream.Conn
 	closeEvent chan bool
 }
 
 // NewSubscriber object
-func NewSubscriber(url, clusterID, clientID, group string, topics []string, subOptions []nstream.Option, options ...nstream.Option) (*Subscriber, error) {
-	var conn, err = nstream.Connect(clusterID, clientID, nstream.NatsURL(url), options...)
+func NewSubscriber(url, clusterID, clientID, group string, topics []string, subOptions []nstream.SubscriptionOption, options ...nstream.Option) (*Subscriber, error) {
+	var conn, err = nstream.Connect(clusterID, clientID, append(options, nstream.NatsURL(url))...)
 	if err != nil || conn == nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func NewSubscriber(url, clusterID, clientID, group string, topics []string, subO
 }
 
 // MustNewSubscriber object
-func MustNewSubscriber(url, clusterID, clientID, group string, topics []string, subOptions []nstream.Option, options ...nstream.Option) *Subscriber {
+func MustNewSubscriber(url, clusterID, clientID, group string, topics []string, subOptions []nstream.SubscriptionOption, options ...nstream.Option) *Subscriber {
 	var sub, err = NewSubscriber(url, clusterID, clientID, group, topics, subOptions, options...)
 	if err != nil || sub == nil {
 		panic(err)
@@ -60,7 +60,7 @@ func (s *Subscriber) Listen() (_ error) {
 
 // message execute
 func (s *Subscriber) message(m *nstream.Msg) {
-	s.Handle(m.Data, false)
+	s.Handle(messageFromNats(m), false)
 }
 
 // Close nstream client
