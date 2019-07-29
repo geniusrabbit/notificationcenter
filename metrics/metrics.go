@@ -30,7 +30,7 @@ type wrapper struct {
 }
 
 // NewWrapper of metrica
-func NewWrapper(mm metricas, format Formater) notificationcenter.Logger {
+func NewWrapper(mm metricas, format Formater) notificationcenter.Streamer {
 	return wrapper{
 		formater: format,
 		logger:   mm,

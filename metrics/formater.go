@@ -10,7 +10,8 @@ type Formater interface {
 	Format(msg interface{}) interface{}
 }
 
-type FnkFormat func (msg interface{}) interface{}
+type FnkFormat func(msg interface{}) interface{}
+
 func (f FnkFormat) Format(msg interface{}) interface{} {
 	return f(msg)
 }

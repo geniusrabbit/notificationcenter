@@ -59,7 +59,7 @@ func (s *Subscriber) Listen() (_ error) {
 
 // message execute
 func (s *Subscriber) message(m *nats.Msg) {
-	s.Handle(m.Data, false)
+	s.Handle((*message)(m), false)
 }
 
 // Close nats client
