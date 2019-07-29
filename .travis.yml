@@ -1,6 +1,7 @@
 language: go
 
 env:
+  - GO111MODULE=on
   - COVERALLS_TOKEN=BFANJXd8QFVuXFQzOfm0KjqEVwtyBAAWo
 
 matrix:
@@ -9,7 +10,6 @@ matrix:
   - go: "tip"
 
 install:
-  - go mod download
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
 
