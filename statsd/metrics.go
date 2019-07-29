@@ -99,7 +99,8 @@ func (s *StatsD) SendMetricas(messages ...interface{}) (err error) {
 
 // Close closes client connection
 func (s *StatsD) Close() error {
-	return s.client().Close()
+	s.client().Close()
+	return nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

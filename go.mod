@@ -1,7 +1,8 @@
 module github.com/geniusrabbit/notificationcenter
 
 require (
-	github.com/Shopify/sarama v1.22.1
+	github.com/Shopify/sarama v1.23.1
+	github.com/bsm/sarama-cluster v2.1.15+incompatible
 	github.com/demdxx/gocast v0.0.0-20160708134729-106586117e3c
 	github.com/nats-io/nats.go v1.8.1
 	github.com/nats-io/stan.go v0.5.0

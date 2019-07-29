@@ -12,12 +12,11 @@
 package kafka
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 	"log"
 
 	"github.com/Shopify/sarama"
-
 	"github.com/geniusrabbit/notificationcenter/encoder"
 )
 
