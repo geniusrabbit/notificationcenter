@@ -1,5 +1,6 @@
 # Notificationcenter stream library
 
+[![Build Status](https://travis-ci.org/geniusrabbit/notificationcenter.svg?branch=master)](https://travis-ci.org/geniusrabbit/notificationcenter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/geniusrabbit/notificationcenter)](https://goreportcard.com/report/github.com/geniusrabbit/notificationcenter)
 [![GoDoc](https://godoc.org/github.com/geniusrabbit/notificationcenter?status.svg)](https://godoc.org/github.com/geniusrabbit/notificationcenter)
 [![Coverage Status](https://coveralls.io/repos/github/geniusrabbit/notificationcenter/badge.svg)](https://coveralls.io/github/geniusrabbit/notificationcenter)
