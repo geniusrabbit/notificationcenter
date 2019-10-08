@@ -51,7 +51,7 @@ func main() {
   nc.Register("events", events)
 
   // Add new handler to process the stream "events"
-  nc.Subscribe("events", notificationcenter.FuncHandler(func(msg nc.Message) error {
+  nc.Subscribe("events", nc.FuncHandler(func(msg nc.Message) error {
     fmt.Printf("%v\n", msg.Data())
     return nil
   }))
@@ -63,6 +63,11 @@ func main() {
 
 ## TODO
 
-* [ ] remove metrics from the stream (DEPRECATED)
+* [ ] Add support Amazon SQS queue
+* [ ] Add support Redis queue
+* [ ] Add support RabbitMQ queue
+* [ ] Add support MySQL notifications queue
+* [X] Add support PostgreSQL notifications queue
+* [X] Remove metrics from the queue (DEPRECATED)
 * [X] Add support NATS & NATS stream
-* [X] Add kafka support
+* [X] Add support kafka queue

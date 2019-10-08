@@ -61,6 +61,7 @@ func (s *Subscriber) SetLogger(logger loggerInterface) {
 
 // Listen kafka consumer
 func (s *Subscriber) Listen() (err error) {
+loop:
 	for {
 		if s.consumer == nil {
 			break
@@ -72,13 +73,21 @@ func (s *Subscriber) Listen() (err error) {
 				if err := s.Handle(m, false); err != nil {
 					s.logError(err)
 				}
+			} else {
+				break loop
 			}
 		case err, ok := <-s.consumer.Errors():
 			if ok {
 				s.logError(err)
+			} else {
+				break loop
 			}
-		case notification := <-s.consumer.Notifications():
-			s.logNotification(notification)
+		case notification, ok := <-s.consumer.Notifications():
+			if ok {
+				s.logNotification(notification)
+			} else {
+				break loop
+			}
 		}
 	}
 	return err
