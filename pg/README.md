@@ -1,7 +1,11 @@
-package pg
+# Postgres event subscriber
 
-/*
-Trigger function
+## Integration with PostgreSQL
+
+To support event processing in PostgreSQL you have to define manually what exactly you want to subscribe.
+This possibility provides PostgreSQL triggers.
+
+### Trigger function
 
 ```sql
 CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS $$
@@ -38,11 +42,10 @@ CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS $$
 $$ LANGUAGE plpgsql;
 ```
 
-Apply the trigger
+### Apply the trigger
 
 ```sql
 CREATE TRIGGER products_notify_event
 AFTER INSERT OR UPDATE OR DELETE ON products
     FOR EACH ROW EXECUTE PROCEDURE notify_event();
 ```
-*/
