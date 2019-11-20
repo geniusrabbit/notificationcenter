@@ -9,6 +9,7 @@ require (
 	github.com/nats-io/nats.go v1.8.1
 	github.com/nats-io/stan.go v0.5.0
 	github.com/samuel/go-zookeeper v0.0.0-20180130194729-c4fab1ac1bec // indirect
+	github.com/stretchr/testify v1.3.0
 	github.com/wvanbergen/kafka v0.0.0-20171203153745-e2edea948ddf
 	github.com/wvanbergen/kazoo-go v0.0.0-20180202103751-f72d8611297a // indirect
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0

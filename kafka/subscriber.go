@@ -6,7 +6,6 @@
 package kafka
 
 import (
-	"github.com/Shopify/sarama"
 	cluster "github.com/bsm/sarama-cluster"
 	"github.com/geniusrabbit/notificationcenter/subscriber"
 )
@@ -28,25 +27,15 @@ type Subscriber struct {
 }
 
 // NewSubscriber connection to kafka "group" from list of topics
-func NewSubscriber(brokers []string, group string, topics []string, configArgs ...*cluster.Config) (*Subscriber, error) {
-	var config *cluster.Config
-
-	if len(configArgs) > 0 && configArgs[0] != nil {
-		config = configArgs[0]
-	} else {
-		// Configure by default to receive the oldest messages
-		config = cluster.NewConfig()
-		config.Consumer.Return.Errors = true
-		config.Group.Return.Notifications = true
-		config.Consumer.Offsets.Initial = sarama.OffsetOldest
+func NewSubscriber(brokers []string, group string, topics []string, options ...OptionSubscriber) (*Subscriber, error) {
+	conf := cluster.NewConfig()
+	for _, opt := range options {
+		opt(conf)
 	}
-
-	consumer, err := cluster.NewConsumer(brokers, group, topics, config)
-
+	consumer, err := cluster.NewConsumer(brokers, group, topics, conf)
 	if err != nil {
 		return nil, err
 	}
-
 	return &Subscriber{consumer: consumer}, nil
 }
 
