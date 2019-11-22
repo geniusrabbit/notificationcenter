@@ -9,6 +9,7 @@ import (
 	"time"
 
 	nc "github.com/geniusrabbit/notificationcenter"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -80,11 +81,8 @@ func Test_EventListening(t *testing.T) {
 	defer execSQL(t, db, testDataEracer)
 
 	// Subsribe on the notification
-	subscriber, err := NewSubscriber(connection, "test_events", nil)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	subscriber := MustSubscriber(connection, "test_events", nil)
+	assert.NotNil(t, subscriber.PgListener())
 
 	messageCount := int32(0)
 	subscriber.Subscribe(nc.FuncHandler(func(msg nc.Message) error {

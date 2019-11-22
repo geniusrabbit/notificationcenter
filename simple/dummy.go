@@ -1,5 +1,5 @@
 //
-// @project GeniusRabbit 2016 - 2017
+// @project GeniusRabbit 2016 - 2017, 2019
 // @author Dmitry Ponomarev <demdxx@gmail.com> 2016 - 2017
 //
 
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter"
 )
 
 // Dummy struct
@@ -41,12 +41,12 @@ func (e *Dummy) Send(messages ...interface{}) (err error) {
 }
 
 // Subscribe new handler
-func (e *Dummy) Subscribe(h notificationcenter.Handler) error {
+func (e *Dummy) Subscribe(h nc.Handler) error {
 	return nil
 }
 
 // Unsubscribe this handler by ptr
-func (e *Dummy) Unsubscribe(h notificationcenter.Handler) error {
+func (e *Dummy) Unsubscribe(h nc.Handler) error {
 	return nil
 }
 

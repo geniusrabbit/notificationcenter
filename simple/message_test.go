@@ -1,4 +1,4 @@
-package pg
+package simple
 
 import (
 	"testing"
@@ -8,12 +8,9 @@ import (
 
 func Test_Message(t *testing.T) {
 	msg := &message{
-		BePid:   1,
-		Channel: "test",
-		Extra:   `{"data": "test"}`,
+		data: []byte(`{"data": "test"}`),
 	}
-	assert.NotNil(t, msg.Notification())
 	assert.Equal(t, []byte(`{"data": "test"}`), msg.Body())
-	assert.Equal(t, `test_1`, msg.ID())
+	assert.Equal(t, ``, msg.ID())
 	assert.Nil(t, msg.Ack())
 }
