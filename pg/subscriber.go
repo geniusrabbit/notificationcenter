@@ -35,17 +35,43 @@ type Subscriber struct {
 	logger loggerInterface
 }
 
-// NewSubscriber connection to kafka "group" from list of topics
-func NewSubscriber(connect, event string, logger loggerInterface) (*Subscriber, error) {
+// NewListenerSubscriber from *pq.Listener object
+func NewListenerSubscriber(listener *pq.Listener, event string, logger loggerInterface) (*Subscriber, error) {
 	if logger == nil {
 		logger = nlog()
 	}
 	return &Subscriber{
 		done:      make(chan bool, 1),
-		listener:  pq.NewListener(connect, 10*time.Second, time.Minute, nil),
+		listener:  listener,
 		eventName: event,
 		logger:    logger,
 	}, nil
+}
+
+// MustListenerSubscriber connection to the postgres "event" or panic
+func MustListenerSubscriber(listener *pq.Listener, event string, logger loggerInterface) *Subscriber {
+	subscriber, err := NewListenerSubscriber(listener, event, logger)
+	if err != nil {
+		panic(err)
+	}
+	return subscriber
+}
+
+// NewSubscriber connection to postgres "event" from list of topics
+func NewSubscriber(connect, event string, logger loggerInterface) (*Subscriber, error) {
+	return NewListenerSubscriber(
+		pq.NewListener(connect, 10*time.Second, time.Minute, nil),
+		event, logger,
+	)
+}
+
+// MustSubscriber connection to the postgres "event" or panic
+func MustSubscriber(connect, event string, logger loggerInterface) *Subscriber {
+	subscriber, err := NewSubscriber(connect, event, logger)
+	if err != nil {
+		panic(err)
+	}
+	return subscriber
 }
 
 // SetLogger interface
@@ -56,6 +82,11 @@ func (s *Subscriber) SetLogger(logger loggerInterface) {
 ///////////////////////////////////////////////////////////////////////////////
 /// Methods
 ///////////////////////////////////////////////////////////////////////////////
+
+// PgListener reader function
+func (s *Subscriber) PgListener() *pq.Listener {
+	return s.listener
+}
 
 // Listen kafka consumer
 func (s *Subscriber) Listen() (err error) {

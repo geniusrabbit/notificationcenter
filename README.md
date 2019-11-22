@@ -7,9 +7,22 @@
 
 > License Apache 2.0
 
-The union eventstream wrapper over nifferent stream implementations.
+The union eventstream wrapper over different stream implementations.
+
+- [Using examples](#Using-examples)
+  - [Create new stream processor](#create-new-stream-processor)
+  - [Send event to the notification stream](#send-event-to-the-notification-stream)
+  - [Subscribe for the specific notification stream](#subscribe-for-the-specific-notification-stream)
+- Modules
+  - [Kafka](kafka)
+  - [NATS](nats)
+  - [NATS Stream](natstream)
+  - [PostgreSQL](pg)
+- [TODO](#todo)
 
 ## Using examples
+
+Basic examples of usage.
 
 ### Create new stream processor
 
@@ -56,7 +69,7 @@ func main() {
     return nil
   }))
 
-  // Run seubscribers listeners
+  // Run subscriber listeners
   nc.Listen()
 }
 ```

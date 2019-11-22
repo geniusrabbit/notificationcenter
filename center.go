@@ -8,14 +8,16 @@ package notificationcenter
 import (
 	"fmt"
 	"io"
+	"log"
 	"sync"
+	"sync/atomic"
 )
 
 var (
 	streamers       = map[string]Streamer{}
 	subscribers     = map[string]Subscriber{}
-	closeEvent      = make(chan bool, 1000)
-	closeEventCount int
+	closeEvent      = make(chan bool, 10)
+	closeEventCount int32
 )
 
 // StreamByName returns streamer interface by codename if exists
@@ -102,7 +104,7 @@ func Send(name string, msg ...interface{}) error {
 
 // Subscribe new handler on some paticular subscriber interface by name
 func Subscribe(name string, h Handler) error {
-	if sub, _ := subscribers[name]; nil != sub {
+	if sub, _ := subscribers[name]; sub != nil {
 		return sub.Subscribe(h)
 	}
 	return fmt.Errorf("Undefined subscriber with name: %s", name)
@@ -121,19 +123,18 @@ func Listen() (err error) {
 	if subscribers == nil {
 		return nil
 	}
-
 	var w sync.WaitGroup
-
-	for _, sub := range subscribers {
+	for name, sub := range subscribers {
 		w.Add(1)
-		go func() {
-			err = sub.Listen()
+		go func(name string, sub Subscriber) {
+			if err = sub.Listen(); err != nil {
+				log.Println(name, err)
+			}
 			w.Done()
-		}()
+		}(name, sub)
 	}
-
 	w.Wait()
-	return
+	return err
 }
 
 // Close notification center
@@ -143,14 +144,12 @@ func Close() {
 			cl.Close()
 		}
 	}
-
 	for _, i := range subscribers {
 		if cl, ok := i.(io.Closer); ok {
 			cl.Close()
 		}
 	}
-
-	for i := 0; i < closeEventCount; i++ {
+	for i := int32(0); i < atomic.LoadInt32(&closeEventCount); i++ {
 		closeEvent <- true
 	}
 }
@@ -165,6 +164,6 @@ func Close() {
 // }
 // ```
 func OnClose() <-chan bool {
-	closeEventCount++
+	atomic.AddInt32(&closeEventCount, 1)
 	return (<-chan bool)(closeEvent)
 }

@@ -51,11 +51,9 @@ func NewMultithreadHandler(count int, handler Handler) MultithreadHandler {
 	} else if count == 0 {
 		count = runtime.NumCPU()
 	}
-
 	if count < 1 {
 		count = 0
 	}
-
 	return multithread{
 		count:   count,
 		handler: handler,
