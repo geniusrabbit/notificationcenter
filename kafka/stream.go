@@ -141,9 +141,6 @@ func (s *Stream) Close() error {
 ///////////////////////////////////////////////////////////////////////////////
 
 func newProducer(brokerList []string, config *sarama.Config) (sarama.AsyncProducer, error) {
-	if config == nil {
-		config = sarama.NewConfig()
-	}
 	producer, err := sarama.NewAsyncProducer(brokerList, config)
 	if err != nil {
 		return nil, fmt.Errorf("[kafka] failed to start producer: %v", err)

@@ -1,11 +1,14 @@
 package kafka
 
 import (
+	"encoding/json"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/geniusrabbit/notificationcenter/encoder"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,4 +62,63 @@ loop:
 
 	assert.Equal(t, messageCount, successCount, "not all messages are success")
 	assert.NoError(t, stream.Close(), "close connection")
+}
+
+func Test_asyncEncode(t *testing.T) {
+	var (
+		wg     sync.WaitGroup
+		msg    testMessage
+		stream = make(chan []byte, 1000)
+	)
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			for j := 0; j < 1000; j++ {
+				buff := acquireBuffer()
+				message := &testMessage{ID: rand.Int(), Title: strFromDict(rand.Intn(100) + 1)}
+				if err := encoder.JSON(message, buff); err == nil {
+					stream <- byteEncoder(buff.Bytes())
+				} else {
+					t.Error(err)
+				}
+				releaseBuffer(buff)
+			}
+			wg.Done()
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(stream)
+	}()
+
+	for data := range stream {
+		if err := json.Unmarshal(data, &msg); err != nil {
+			t.Error(err, string(data))
+		}
+		(kafkaByteEncoder)(data).Release()
+	}
+}
+
+func Test_NewStreamError(t *testing.T) {
+	_, err := NewStream(nil, nil)
+	assert.Error(t, err)
+}
+
+func Test_NewStreamPanic(t *testing.T) {
+	defer func() {
+		assert.True(t, recover() != nil)
+	}()
+	MustNewStream(nil, nil)
+	time.Sleep(time.Millisecond * 100)
+}
+
+func strFromDict(strSize int) string {
+	const dict = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*_+-=~"
+	var bytes = make([]byte, strSize)
+	rand.Read(bytes)
+	for k, v := range bytes {
+		bytes[k] = dict[v%byte(len(dict))]
+	}
+	return string(bytes)
 }
