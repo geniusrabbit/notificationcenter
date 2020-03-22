@@ -1,4 +1,4 @@
-# Notificationcenter stream library
+# Notificationcenter pub/sub library
 
 [![Build Status](https://travis-ci.org/geniusrabbit/notificationcenter.svg?branch=master)](https://travis-ci.org/geniusrabbit/notificationcenter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/geniusrabbit/notificationcenter)](https://goreportcard.com/report/github.com/geniusrabbit/notificationcenter)
@@ -7,7 +7,15 @@
 
 > License Apache 2.0
 
-The union eventstream wrapper over different stream implementations.
+Publish/subscribe messaging, or pub/sub messaging, is a form of asynchronous
+service-to-service communication used in serverless and microservices architectures.
+In a pub/sub model, any message published to a topic is immediately received by all
+of the subscribers to the topic. Pub/sub messaging can be used to enable event-driven
+architectures, or to decouple applications in order to increase performance,
+reliability and scalability.
+
+Library provides basic primitives to use different queue implementations behind,
+simplify writing pub/sub-services.
 
 - [Using examples](#Using-examples)
   - [Create new stream processor](#create-new-stream-processor)
@@ -18,23 +26,31 @@ The union eventstream wrapper over different stream implementations.
   - [NATS](nats)
   - [NATS Stream](natstream)
   - [PostgreSQL](pg)
+  - [Golang Chanels implementation](gochan)
+  - [Golang time interval executor](interval)
 - [TODO](#todo)
 
 ## Using examples
 
 Basic examples of usage.
 
-### Create new stream processor
+```go
+import(
+  nc "github.com/geniusrabbit/notificationcenter"
+)
+```
+
+### Create new publisher processor
 
 ```go
-// Create new stream processor
-eventStream, err = nats.NewStream([]string{"event"}, "nats://hostname:4222")
+// Create new publisher processor
+eventStream, err = nats.NewPublisher([]string{"event"}, nats.WithNatsURL("nats://hostname:4222"))
 if err != nil {
   log.Fatal(err)
 }
 
 // Register stream processor
-err = notificationcenter.Register("events", eventStream)
+err = nc.Register("events", eventStream)
 if err != nil {
   log.Fatal(err)
 }
@@ -44,11 +60,11 @@ if err != nil {
 
 ```go
 // Send by global functions
-notificationcenter.Send("events", message{title: "event 1"})
+nc.Publish(context.Background(), "events", message{title: "event 1"})
 
 // Send by logger interface
-events := notificationcenter.StreamByName("events")
-events.Send(message{title: "event 2"})
+events := nc.Publisher("events")
+events.Publish(context.Background(), message{title: "event 2"})
 ```
 
 ### Subscribe for the specific notification stream
@@ -60,17 +76,25 @@ import (
 )
 
 func main() {
-  events := nats.MustNewSubscriber("nats://connection", "group", []string{"events"})
+  ctx := context.Background()
+  events := nats.MustNewSubscriber([]string{"events"},
+    nats.WithNatsURL("nats://connection"), nats.WithGroupName(`group`))
   nc.Register("events", events)
+  nc.Register("refresh", interval.NewSubscriber(time.Minute * 5))
 
-  // Add new handler to process the stream "events"
-  nc.Subscribe("events", nc.FuncHandler(func(msg nc.Message) error {
+  // Add new receiver to process the stream "events"
+  nc.Subscribe("events", nc.FuncReceiver(ctx, func(msg nc.Message) error {
     fmt.Printf("%v\n", msg.Data())
     return nil
   }))
 
+  // Add new time interval receiver to refresh the data every 5 minutes
+  nc.Subscribe("refresh", nc.FuncReceiver(ctx, func(msg nc.Message) error {
+    return db.Reload()
+  }))
+
   // Run subscriber listeners
-  nc.Listen()
+  nc.Listen(ctx)
 }
 ```
 
@@ -84,3 +108,5 @@ func main() {
 * [X] Remove metrics from the queue (DEPRECATED)
 * [X] Add support NATS & NATS stream
 * [X] Add support kafka queue
+* [X] Add support native GO chanels
+* [X] Add support native GO time interval

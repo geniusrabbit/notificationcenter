@@ -11,7 +11,7 @@ type message pq.Notification
 // Unical message ID (depends on transport)
 func (m *message) ID() string {
 	n := m.Notification()
-	return fmt.Sprintf("%s_%d", n.Channel, n.BePid)
+	return fmt.Sprintf("%s-%d", n.Channel, n.BePid)
 }
 
 // Body returns message data as bytes

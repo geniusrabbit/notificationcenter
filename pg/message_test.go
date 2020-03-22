@@ -14,6 +14,6 @@ func Test_Message(t *testing.T) {
 	}
 	assert.NotNil(t, msg.Notification())
 	assert.Equal(t, []byte(`{"data": "test"}`), msg.Body())
-	assert.Equal(t, `test_1`, msg.ID())
+	assert.Equal(t, `test-1`, msg.ID())
 	assert.Nil(t, msg.Ack())
 }

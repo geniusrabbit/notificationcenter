@@ -1,12 +1,13 @@
 package pg
 
 import (
+	"context"
 	"database/sql"
 	"os"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
-	"time"
 
 	nc "github.com/geniusrabbit/notificationcenter"
 	"github.com/stretchr/testify/assert"
@@ -84,8 +85,13 @@ func Test_EventListening(t *testing.T) {
 	subscriber := MustSubscriber(connection, "test_events", nil)
 	assert.NotNil(t, subscriber.PgListener())
 
-	messageCount := int32(0)
-	subscriber.Subscribe(nc.FuncHandler(func(msg nc.Message) error {
+	var (
+		wg           sync.WaitGroup
+		ctx          = context.TODO()
+		messageCount = int32(0)
+	)
+	err = subscriber.Subscribe(ctx, nc.FuncReceiver(func(msg nc.Message) error {
+		defer wg.Done()
 		if !strings.HasPrefix(msg.ID(), "test_events") {
 			t.Error("invalid event message:", msg.ID())
 		} else {
@@ -93,15 +99,18 @@ func Test_EventListening(t *testing.T) {
 		}
 		return nil
 	}))
-	go subscriber.Listen()
+
+	if err != nil {
+		t.Error(`invalid subscribe receiver`, err)
+	}
+	go subscriber.Listen(ctx)
 
 	for i := 0; i <= testEventCount; i++ {
+		wg.Add(1)
 		db.Exec(testDataOperation)
-		time.Sleep(100 * time.Millisecond)
 	}
 
-	time.Sleep(1 * time.Second)
-
+	wg.Wait()
 	if cnt := atomic.LoadInt32(&messageCount); cnt != testEventCount {
 		t.Errorf("not all events was delivered: %d of %d", cnt, testEventCount)
 	}

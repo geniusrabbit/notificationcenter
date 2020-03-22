@@ -1,43 +1,72 @@
 //
-// @project GeniusRabbit 2016 – 2019
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2019
+// @project GeniusRabbit 2016 – 2020
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2020
 //
 
 package nats
 
 import (
+	"context"
+
 	nats "github.com/nats-io/nats.go"
 
-	"github.com/geniusrabbit/notificationcenter/subscriber"
+	"github.com/geniusrabbit/notificationcenter"
 )
+
+type loggerInterface interface {
+	Error(params ...interface{})
+	Debugf(msg string, params ...interface{})
+}
 
 // Subscriber for NATS queue
 type Subscriber struct {
-	subscriber.Base
-	group      string
-	topics     []string
-	conn       *nats.Conn
+	notificationcenter.ModelSubscriber
+
+	// Group name
+	group string
+
+	// List of subscibed topics
+	topics []string
+
+	// Subscriptions
+	natsSubscriptions []*nats.Subscription
+
+	// connection to the nats server
+	conn *nats.Conn
+
+	// Close connection event queue
 	closeEvent chan bool
+
+	// logger interface
+	logger loggerInterface
 }
 
-// NewSubscriber object
-func NewSubscriber(url, group string, topics []string, options ...nats.Option) (*Subscriber, error) {
-	var conn, err = nats.Connect(url, options...)
+// NewSubscriber creates new subscriber object
+func NewSubscriber(url string, topics []string, options ...Option) (*Subscriber, error) {
+	var opts Options
+	for _, opt := range options {
+		opt(&opts)
+	}
+	conn, err := nats.Connect(url, opts.NatsOptions...)
 	if err != nil || conn == nil {
 		return nil, err
 	}
-
-	return &Subscriber{
-		group:      group,
+	sub := &Subscriber{
+		ModelSubscriber: notificationcenter.ModelSubscriber{
+			ErrorHandler: opts.ErrorHandler,
+			PanicHandler: opts.PanicHandler,
+		},
+		group:      opts.group(),
 		topics:     topics,
 		conn:       conn,
 		closeEvent: make(chan bool, 1),
-	}, nil
+	}
+	return sub, sub.subscribe()
 }
 
-// MustNewSubscriber object
-func MustNewSubscriber(url, group string, topics []string, options ...nats.Option) *Subscriber {
-	var sub, err = NewSubscriber(url, group, topics, options...)
+// MustNewSubscriber creates new subscriber object
+func MustNewSubscriber(url string, topics []string, options ...Option) *Subscriber {
+	sub, err := NewSubscriber(url, topics, options...)
 	if err != nil || sub == nil {
 		panic(err)
 	}
@@ -45,29 +74,40 @@ func MustNewSubscriber(url, group string, topics []string, options ...nats.Optio
 }
 
 // Listen kafka consumer
-func (s *Subscriber) Listen() (_ error) {
-	for _, topic := range s.topics {
-		if s.group != "" {
-			s.conn.QueueSubscribe(topic, s.group, s.message)
-		} else {
-			s.conn.Subscribe(topic, s.message)
-		}
+func (s *Subscriber) Listen(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+	case <-s.closeEvent:
 	}
-	<-s.closeEvent
-	return
+	return nil
+}
+
+func (s *Subscriber) subscribe() (err error) {
+	for _, topic := range s.topics {
+		var sub *nats.Subscription
+		if s.group != `` {
+			sub, err = s.conn.QueueSubscribe(topic, s.group, s.message)
+		} else {
+			sub, err = s.conn.Subscribe(topic, s.message)
+		}
+		if err != nil {
+			break
+		}
+		s.natsSubscriptions = append(s.natsSubscriptions, sub)
+	}
+	return err
 }
 
 // message execute
 func (s *Subscriber) message(m *nats.Msg) {
-	s.Handle((*message)(m), false)
+	if err := s.ProcessMessage((*message)(m)); err != nil {
+		s.logger.Error(err)
+	}
 }
 
 // Close nats client
 func (s *Subscriber) Close() error {
-	if s.conn != nil {
-		s.conn.Close()
-		s.conn = nil
-		s.closeEvent <- true
-	}
+	s.conn.Close()
+	s.closeEvent <- true
 	return nil
 }

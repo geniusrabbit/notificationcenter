@@ -1,15 +1,17 @@
 //
-// @project geniusrabbit.com 2019
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2019
+// @project geniusrabbit.com 2019 - 2020
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2019 - 2020
 //
 
 package pg
 
 import (
+	"context"
 	"time"
 
-	"github.com/geniusrabbit/notificationcenter/subscriber"
 	"github.com/lib/pq"
+
+	nc "github.com/geniusrabbit/notificationcenter"
 )
 
 type loggerInterface interface {
@@ -20,7 +22,7 @@ type loggerInterface interface {
 
 // Subscriber for kafka
 type Subscriber struct {
-	subscriber.Base
+	nc.ModelSubscriber
 
 	// Done chanel
 	done chan bool
@@ -89,26 +91,33 @@ func (s *Subscriber) PgListener() *pq.Listener {
 }
 
 // Listen kafka consumer
-func (s *Subscriber) Listen() (err error) {
+func (s *Subscriber) Listen(ctx context.Context) (err error) {
 	if err = s.listener.Listen(s.eventName); err != nil {
 		return err
 	}
+loop:
 	for {
 		select {
 		case n := <-s.listener.Notify:
 			s.logger.Debugf("Received data from channel [%s]", n.Channel)
-			err = s.Handle((*message)(n), true)
+			err = s.ProcessMessage((*message)(n))
 		case <-time.After(90 * time.Second):
 			s.logger.Info("Received no events for 90 seconds, checking connection")
 			err = s.listener.Ping()
+		case <-ctx.Done():
+			break loop
 		case <-s.done:
-			return nil
+			break loop
+		}
+		if err != nil {
+			s.logger.Error(err)
 		}
 	}
+	return err
 }
 
 // Close kafka consumer
-func (s *Subscriber) Close() (err error) {
+func (s *Subscriber) Close() error {
 	s.done <- true
-	return s.CloseAll()
+	return nil
 }

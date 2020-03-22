@@ -1,13 +1,16 @@
 //
-// @project geniusrabbit.com 2015, 2019
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019
+// @project geniusrabbit.com 2015, 2019 - 2020
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2020
 //
 
 package kafka
 
 import (
+	"context"
+	"time"
+
 	cluster "github.com/bsm/sarama-cluster"
-	"github.com/geniusrabbit/notificationcenter/subscriber"
+	"github.com/geniusrabbit/notificationcenter"
 )
 
 type loggerInterface interface {
@@ -15,33 +18,43 @@ type loggerInterface interface {
 	Debugf(msg string, params ...interface{})
 }
 
+// SubscriberNotificationHandler callback function
+type SubscriberNotificationHandler func(notification *cluster.Notification)
+
 // Subscriber for kafka
 type Subscriber struct {
-	subscriber.Base
+	notificationcenter.ModelSubscriber
 
 	// consumer object which receive the messages
 	consumer *cluster.Consumer
+
+	// notificationHandler callback
+	notificationHandler SubscriberNotificationHandler
 
 	// logger interface
 	logger loggerInterface
 }
 
 // NewSubscriber connection to kafka "group" from list of topics
-func NewSubscriber(brokers []string, group string, topics []string, options ...OptionSubscriber) (*Subscriber, error) {
-	conf := cluster.NewConfig()
+func NewSubscriber(brokers, topics []string, options ...Option) (*Subscriber, error) {
+	var opts Options
+	opts.ClusterConfig = *cluster.NewConfig()
+	opts.ClusterConfig.Consumer.Offsets.CommitInterval = time.Second
 	for _, opt := range options {
-		opt(conf)
+		opt(&opts)
 	}
-	consumer, err := cluster.NewConsumer(brokers, group, topics, conf)
+	consumer, err := cluster.NewConsumer(brokers, opts.group(), topics, opts.clusterConfig())
 	if err != nil {
 		return nil, err
 	}
-	return &Subscriber{consumer: consumer}, nil
-}
-
-// SetLogger interface
-func (s *Subscriber) SetLogger(logger loggerInterface) {
-	s.logger = logger
+	return &Subscriber{
+		ModelSubscriber: notificationcenter.ModelSubscriber{
+			ErrorHandler: opts.ErrorHandler,
+			PanicHandler: opts.PanicHandler,
+		},
+		consumer: consumer,
+		logger:   opts.logger(),
+	}, nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +62,7 @@ func (s *Subscriber) SetLogger(logger loggerInterface) {
 ///////////////////////////////////////////////////////////////////////////////
 
 // Listen kafka consumer
-func (s *Subscriber) Listen() (err error) {
+func (s *Subscriber) Listen(ctx context.Context) (err error) {
 loop:
 	for {
 		if s.consumer == nil {
@@ -57,26 +70,27 @@ loop:
 		}
 		select {
 		case msg, ok := <-s.consumer.Messages():
-			if ok {
-				m := &message{msg: msg, consumer: s.consumer}
-				if err := s.Handle(m, false); err != nil {
-					s.logError(err)
-				}
-			} else {
+			if !ok {
 				break loop
+			}
+			m := &message{msg: msg, consumer: s.consumer}
+			if err := s.ProcessMessage(m); err != nil {
+				s.logger.Error(err)
 			}
 		case err, ok := <-s.consumer.Errors():
-			if ok {
-				s.logError(err)
-			} else {
+			if !ok {
 				break loop
+			}
+			if err != nil {
+				s.processError(err)
 			}
 		case notification, ok := <-s.consumer.Notifications():
-			if ok {
-				s.logNotification(notification)
-			} else {
+			if !ok {
 				break loop
 			}
+			s.processNotification(notification)
+		case <-ctx.Done():
+			break loop
 		}
 	}
 	return err
@@ -85,20 +99,24 @@ loop:
 // Close kafka consumer
 func (s *Subscriber) Close() (err error) {
 	if err = s.consumer.Close(); err != nil {
-		s.CloseAll()
+		s.ModelSubscriber.Close()
 		return err
 	}
-	return s.CloseAll()
+	return s.ModelSubscriber.Close()
 }
 
-func (s *Subscriber) logError(err error) {
-	if s.logger != nil && err != nil {
+func (s *Subscriber) processError(err error) {
+	if s.ModelSubscriber.ErrorHandler != nil {
+		s.ModelSubscriber.ErrorHandler(nil, err)
+	} else {
 		s.logger.Error(err)
 	}
 }
 
-func (s *Subscriber) logNotification(notification *cluster.Notification) {
-	if s.logger != nil && notification != nil {
+func (s *Subscriber) processNotification(notification *cluster.Notification) {
+	if s.notificationHandler != nil {
+		s.notificationHandler(notification)
+	} else {
 		s.logger.Debugf("consumer notification: %+v", notification)
 	}
 }
