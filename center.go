@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2016 – 2017, 2019
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017, 2019
+// @project geniusrabbit.com 2016 – 2017, 2019 - 2020
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017, 2019 - 2020
 //
 
 package notificationcenter

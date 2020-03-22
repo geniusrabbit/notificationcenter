@@ -18,9 +18,9 @@ Library provides basic primitives to use different queue implementations behind,
 simplify writing pub/sub-services.
 
 - [Using examples](#Using-examples)
-  - [Create new stream processor](#create-new-stream-processor)
-  - [Send event to the notification stream](#send-event-to-the-notification-stream)
-  - [Subscribe for the specific notification stream](#subscribe-for-the-specific-notification-stream)
+  - [Create new publisher processor](#create-new-publisher-processor)
+  - [Send event by the notification publisher](#send-event-by-the-notification-publisher)
+  - [Subscribe by the specific notification publisher](#subscribe-by-the-specific-notification-publisher)
 - Modules
   - [Kafka](kafka)
   - [NATS](nats)
@@ -56,7 +56,7 @@ if err != nil {
 }
 ```
 
-### Send event to the notification stream
+### Send event by the notification publisher
 
 ```go
 // Send by global functions
@@ -67,7 +67,7 @@ events := nc.Publisher("events")
 events.Publish(context.Background(), message{title: "event 2"})
 ```
 
-### Subscribe for the specific notification stream
+### Subscribe by the specific notification publisher
 
 ```go
 import (

@@ -60,6 +60,7 @@ func NewSubscriber(url string, topics []string, options ...Option) (*Subscriber,
 		topics:     topics,
 		conn:       conn,
 		closeEvent: make(chan bool, 1),
+		logger:     opts.logger(),
 	}
 	return sub, sub.subscribe()
 }

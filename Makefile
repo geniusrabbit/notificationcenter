@@ -91,6 +91,25 @@ generate-code: ## Generate mocks for the project
 	@echo "Generate mocks for the project"
 	@go generate ./...
 
+.PHONY: golint
+golint: $(GOLINT)
+	golint -set_exit_status ./...
+
+.PHONY: vet
+vet:
+	go vet ./...
+
+.PHONY:
+errcheck: $(ERRCHECK)
+	errcheck ./...
+
+.PHONY: staticcheck
+staticcheck: $(STATICCHECK)
+	staticcheck ./...
+
+.PHONY: lint
+lint: golint vet errcheck staticcheck
+
 .PHONY: test
 test: ## Run package test
 	go test -race ./...

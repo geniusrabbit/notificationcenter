@@ -97,8 +97,8 @@ loop:
 }
 
 // Close kafka consumer
-func (s *Subscriber) Close() (err error) {
-	if err = s.consumer.Close(); err != nil {
+func (s *Subscriber) Close() error {
+	if err := s.consumer.Close(); err != nil {
 		s.ModelSubscriber.Close()
 		return err
 	}

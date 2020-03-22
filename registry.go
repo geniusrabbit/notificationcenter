@@ -30,7 +30,7 @@ type Registry struct {
 // NewRegistry init new registry object
 func NewRegistry() *Registry {
 	return &Registry{
-		closeEvent:  make(chan bool, 0),
+		closeEvent:  make(chan bool),
 		publishers:  map[string]Publisher{},
 		subscribers: map[string]Subscriber{},
 	}
@@ -38,14 +38,12 @@ func NewRegistry() *Registry {
 
 // Publisher returns pub interface by name if exists or Nil otherwise
 func (r *Registry) Publisher(name string) Publisher {
-	l, _ := r.publishers[name]
-	return l
+	return r.publishers[name]
 }
 
 // Subscriber returns sub interface by name if exists or Nil otherwise
 func (r *Registry) Subscriber(name string) Subscriber {
-	s, _ := r.subscribers[name]
-	return s
+	return r.subscribers[name]
 }
 
 // Register one or more Publisher or Subscriber services.
@@ -121,18 +119,26 @@ func (r *Registry) Listen(ctx context.Context) (err error) {
 
 // Close notification center
 func (r *Registry) Close() error {
+	var errors []error
 	for _, pub := range r.publishers {
 		if cl, ok := pub.(io.Closer); ok {
-			cl.Close()
+			if err := cl.Close(); err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for _, sub := range r.subscribers {
 		if cl, ok := sub.(io.Closer); ok {
-			cl.Close()
+			if err := cl.Close(); err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 	for i := int32(0); i < atomic.LoadInt32(&r.closeEventCount); i++ {
 		r.closeEvent <- true
+	}
+	if len(errors) > 0 {
+		return &multierror{errors}
 	}
 	return nil
 }
