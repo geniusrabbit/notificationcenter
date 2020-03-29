@@ -34,7 +34,7 @@ type Publisher struct {
 }
 
 // NewPublisher object
-func NewPublisher(topics []string, options ...Option) (*Publisher, error) {
+func NewPublisher(options ...Option) (*Publisher, error) {
 	var opts Options
 	for _, opt := range options {
 		opt(&opts)
@@ -44,7 +44,7 @@ func NewPublisher(topics []string, options ...Option) (*Publisher, error) {
 		return nil, err
 	}
 	return &Publisher{
-		topics:       topics,
+		topics:       opts.Topics,
 		conn:         conn,
 		errorHandler: opts.ErrorHandler,
 		panicHandler: opts.PanicHandler,
@@ -53,8 +53,8 @@ func NewPublisher(topics []string, options ...Option) (*Publisher, error) {
 }
 
 // MustNewPublisher object
-func MustNewPublisher(topics []string, options ...Option) *Publisher {
-	Publisher, err := NewPublisher(topics, options...)
+func MustNewPublisher(options ...Option) *Publisher {
+	Publisher, err := NewPublisher(options...)
 	if err != nil || Publisher == nil {
 		panic(err)
 	}

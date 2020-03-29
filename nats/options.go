@@ -1,6 +1,9 @@
 package nats
 
 import (
+	"net/url"
+	"strings"
+
 	nats "github.com/nats-io/nats.go"
 
 	nc "github.com/geniusrabbit/notificationcenter"
@@ -21,6 +24,9 @@ type Options struct {
 
 	// Name of the subscription group
 	GroupName string
+
+	// Names of topics for subscribing or publishing
+	Topics []string
 
 	// ErrorHandler of message processing
 	ErrorHandler nc.ErrorHandler
@@ -76,9 +82,26 @@ func WithNatsConn(conn *nats.Conn) Option {
 // WithNatsURL is an Option to set the URL the client should connect to.
 // The url can contain username/password semantics. e.g. nats://derek:pass@localhost:4222
 // Comma separated arrays are also supported, e.g. urlA, urlB.
-func WithNatsURL(url string) Option {
+func WithNatsURL(urlString string) Option {
 	return func(opt *Options) {
-		opt.ConnURL = url
+		u, err := url.Parse(urlString)
+		if err != nil {
+			panic(err)
+		}
+		if len(u.Path) > 1 {
+			opt.GroupName = u.Path[1:]
+		}
+		topics := strings.Split(u.Query().Get(`topics`), `,`)
+		if len(topics) == 1 && topics[0] == `` {
+			topics = nil
+		}
+		u.Path = ``
+		u.RawQuery = ``
+
+		opt.ConnURL = u.String()
+		if len(topics) > 0 {
+			opt.Topics = topics
+		}
 	}
 }
 
@@ -130,6 +153,13 @@ func WithNkey(pubKey string, sigCB nats.SignatureHandler) Option {
 func WithGroupName(name string) Option {
 	return func(opt *Options) {
 		opt.GroupName = name
+	}
+}
+
+// WithTopics will set the list of topics for publishing or subscribing
+func WithTopics(topics ...string) Option {
+	return func(opt *Options) {
+		opt.Topics = topics
 	}
 }
 

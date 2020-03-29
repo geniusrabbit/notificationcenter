@@ -11,13 +11,13 @@ func TestNewPublisherPanic(t *testing.T) {
 		rec := recover()
 		assert.NotNil(t, rec)
 	}()
-	pub := MustNewPublisher(nil, WithNatsURL(`nats://demo`), WithTokenHandler(nil))
+	pub := MustNewPublisher(WithNatsURL(`nats://demo`), WithTokenHandler(nil))
 	err := pub.Close()
 	assert.NoError(t, err)
 }
 
 func TestNewPublisher(t *testing.T) {
-	pub, err := NewPublisher(nil,
+	pub, err := NewPublisher(
 		WithNatsURL(`nats://demo`),
 		WithClientName(`test`),
 		WithEncoder(nil),

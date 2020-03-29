@@ -45,7 +45,7 @@ type Subscriber struct {
 }
 
 // NewSubscriber creates new subscriber object
-func NewSubscriber(topics []string, options ...Option) (*Subscriber, error) {
+func NewSubscriber(options ...Option) (*Subscriber, error) {
 	var opts Options
 	for _, opt := range options {
 		opt(&opts)
@@ -61,7 +61,7 @@ func NewSubscriber(topics []string, options ...Option) (*Subscriber, error) {
 		},
 		conn:              conn,
 		group:             opts.group(),
-		topics:            topics,
+		topics:            opts.Topics,
 		natsSubscriptions: opts.NatsSubscriptions,
 		closeEvent:        make(chan bool, 1),
 		logger:            opts.logger(),
@@ -69,8 +69,8 @@ func NewSubscriber(topics []string, options ...Option) (*Subscriber, error) {
 }
 
 // MustNewSubscriber creates new subscriber object
-func MustNewSubscriber(topics []string, options ...Option) *Subscriber {
-	sub, err := NewSubscriber(topics, options...)
+func MustNewSubscriber(options ...Option) *Subscriber {
+	sub, err := NewSubscriber(options...)
 	if err != nil || sub == nil {
 		panic(err)
 	}

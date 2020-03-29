@@ -34,7 +34,7 @@ type Publisher struct {
 }
 
 // NewPublisher of the NATS stream server
-func NewPublisher(topic string, options ...Option) (*Publisher, error) {
+func NewPublisher(options ...Option) (*Publisher, error) {
 	var opts Options
 	for _, opt := range options {
 		opt(&opts)
@@ -44,7 +44,7 @@ func NewPublisher(topic string, options ...Option) (*Publisher, error) {
 		return nil, err
 	}
 	return &Publisher{
-		topic:        topic,
+		topic:        opts.randomTopic(),
 		conn:         conn,
 		encoder:      opts.encoder(),
 		errorHandler: opts.ErrorHandler,
@@ -53,8 +53,8 @@ func NewPublisher(topic string, options ...Option) (*Publisher, error) {
 }
 
 // MustNewPublisher of the NATS stream server
-func MustNewPublisher(topic string, options ...Option) *Publisher {
-	stream, err := NewPublisher(topic, options...)
+func MustNewPublisher(options ...Option) *Publisher {
+	stream, err := NewPublisher(options...)
 	if err != nil || stream == nil {
 		panic(err)
 	}

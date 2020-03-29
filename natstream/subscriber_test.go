@@ -11,12 +11,12 @@ func TestNewSubscriberPanic(t *testing.T) {
 		rec := recover()
 		assert.NotNil(t, rec)
 	}()
-	sub := MustNewSubscriber(nil, WithNatsURL(`nats://demo`))
+	sub := MustNewSubscriber(WithNatsURL(`nats://demo`))
 	sub.Close()
 }
 
 func TestNewSubscriber(t *testing.T) {
-	sub, err := NewSubscriber(nil,
+	sub, err := NewSubscriber(
 		WithNatsURL(`nats://demo`),
 		WithGroupName(`test`),
 		WithLogger(nil),

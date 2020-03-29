@@ -1,4 +1,4 @@
-package nats
+package natstream
 
 import (
 	"testing"
@@ -8,12 +8,12 @@ import (
 
 func TestOption(t *testing.T) {
 	var options Options
-	conn, err := options.clientConn()
 	assert.NotNil(t, options.encoder(), `encoder`)
 	assert.Equal(t, `default`, options.group())
 	assert.NotNil(t, options.logger(), `logger`)
-	assert.Nil(t, conn)
-	assert.Error(t, err)
+	assert.Equal(t, `default`, options.clusterID())
+	assert.Equal(t, `default`, options.clientID())
+	assert.Equal(t, `default`, options.randomTopic())
 }
 
 func TestOptionWithURL(t *testing.T) {
