@@ -7,6 +7,8 @@ package nats
 
 import (
 	"context"
+	"net/url"
+	"strings"
 
 	nats "github.com/nats-io/nats.go"
 
@@ -42,12 +44,12 @@ type Subscriber struct {
 }
 
 // NewSubscriber creates new subscriber object
-func NewSubscriber(url string, topics []string, options ...Option) (*Subscriber, error) {
+func NewSubscriber(topics []string, options ...Option) (*Subscriber, error) {
 	var opts Options
 	for _, opt := range options {
 		opt(&opts)
 	}
-	conn, err := nats.Connect(url, opts.NatsOptions...)
+	conn, err := opts.clientConn()
 	if err != nil || conn == nil {
 		return nil, err
 	}
@@ -65,9 +67,29 @@ func NewSubscriber(url string, topics []string, options ...Option) (*Subscriber,
 	return sub, sub.subscribe()
 }
 
+// NewSubscriberURL from URL value
+// @url nats://login:password@hostname:port/group?topics=topic1,topic2,topicN
+func NewSubscriberURL(urlString string, options ...Option) (*Subscriber, error) {
+	u, err := url.Parse(urlString)
+	if err != nil {
+		return nil, err
+	}
+	if len(u.Path) > 1 {
+		options = append(options, WithGroupName(u.Path[1:]))
+	}
+	options = append(options, WithNatsURL(u.String()))
+	topics := strings.Split(u.Query().Get(`topics`), `,`)
+	if len(topics) == 1 && topics[0] == `` {
+		topics = nil
+	}
+	u.Path = ``
+	u.RawQuery = ``
+	return NewSubscriber(topics, options...)
+}
+
 // MustNewSubscriber creates new subscriber object
-func MustNewSubscriber(url string, topics []string, options ...Option) *Subscriber {
-	sub, err := NewSubscriber(url, topics, options...)
+func MustNewSubscriber(topics []string, options ...Option) *Subscriber {
+	sub, err := NewSubscriber(topics, options...)
 	if err != nil || sub == nil {
 		panic(err)
 	}
