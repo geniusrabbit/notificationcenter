@@ -11,25 +11,29 @@ const minimalMessageSize = 1000
 
 var byteEncoderPool = sync.Pool{
 	New: func() interface{} {
-		return make(kafkaByteEncoder, 0, minimalMessageSize)
+		return &kafkaByteEncoder{data: make([]byte, 0, minimalMessageSize)}
 	},
 }
 
-type kafkaByteEncoder []byte
-
-func (k kafkaByteEncoder) Encode() ([]byte, error) {
-	return k, nil
+type kafkaByteEncoder struct {
+	data []byte
 }
 
-func (k kafkaByteEncoder) Length() int {
-	return len(k)
+func (k *kafkaByteEncoder) Encode() ([]byte, error) {
+	return k.data, nil
 }
 
-func (k kafkaByteEncoder) Release() {
-	byteEncoderPool.Put(k[:0])
+func (k *kafkaByteEncoder) Length() int {
+	return len(k.data)
 }
 
-func byteEncoder(data []byte) kafkaByteEncoder {
-	byteEncoder := byteEncoderPool.New().(kafkaByteEncoder)
-	return append(byteEncoder, data...)
+func (k *kafkaByteEncoder) Release() {
+	k.data = k.data[:0]
+	byteEncoderPool.Put(k)
+}
+
+func byteEncoder(data []byte) *kafkaByteEncoder {
+	byteEncoder := byteEncoderPool.New().(*kafkaByteEncoder)
+	byteEncoder.data = append(byteEncoder.data, data...)
+	return byteEncoder
 }

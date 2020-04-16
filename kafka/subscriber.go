@@ -36,14 +36,14 @@ type Subscriber struct {
 }
 
 // NewSubscriber connection to kafka "group" from list of topics
-func NewSubscriber(brokers, topics []string, options ...Option) (*Subscriber, error) {
+func NewSubscriber(options ...Option) (*Subscriber, error) {
 	var opts Options
 	opts.ClusterConfig = *cluster.NewConfig()
 	opts.ClusterConfig.Consumer.Offsets.CommitInterval = time.Second
 	for _, opt := range options {
 		opt(&opts)
 	}
-	consumer, err := cluster.NewConsumer(brokers, opts.group(), topics, opts.clusterConfig())
+	consumer, err := cluster.NewConsumer(opts.Brokers, opts.group(), opts.Topics, opts.clusterConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ loop:
 // Close kafka consumer
 func (s *Subscriber) Close() error {
 	if err := s.consumer.Close(); err != nil {
-		s.ModelSubscriber.Close()
+		_ = s.ModelSubscriber.Close()
 		return err
 	}
 	return s.ModelSubscriber.Close()

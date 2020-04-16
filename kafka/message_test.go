@@ -13,7 +13,7 @@ import (
 	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
 )
 
-func Test_Message(t *testing.T) {
+func TestMessage(t *testing.T) {
 	msg := &message{
 		msg:      &sarama.ConsumerMessage{Value: []byte(`{"data": "test"}`)},
 		consumer: nil,
@@ -23,11 +23,11 @@ func Test_Message(t *testing.T) {
 	assert.Error(t, msg.Ack())
 }
 
-func Test_asyncEncode(t *testing.T) {
+func TestAsyncEncode(t *testing.T) {
 	var (
 		wg     sync.WaitGroup
 		msg    testMessage
-		stream = make(chan []byte, 1000)
+		stream = make(chan *kafkaByteEncoder, 1000)
 	)
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
@@ -52,9 +52,9 @@ func Test_asyncEncode(t *testing.T) {
 	}()
 
 	for data := range stream {
-		if err := json.Unmarshal(data, &msg); err != nil {
-			t.Error(err, string(data))
+		if err := json.Unmarshal(data.data, &msg); err != nil {
+			t.Error(err, string(data.data))
 		}
-		(kafkaByteEncoder)(data).Release()
+		data.Release()
 	}
 }

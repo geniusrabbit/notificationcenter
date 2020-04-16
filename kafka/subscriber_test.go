@@ -16,7 +16,7 @@ const (
 	testConsumerGroupName = `default`
 )
 
-func Test_SubscriberReceiveMessages(t *testing.T) {
+func TestSubscriberReceiveMessages(t *testing.T) {
 	testMsg := sarama.StringEncoder("Foo")
 	broker0 := sarama.NewMockBroker(t, 0)
 	messageCount := 10
@@ -53,7 +53,8 @@ func Test_SubscriberReceiveMessages(t *testing.T) {
 
 	// Connect to the mock broker
 	sub, err := NewSubscriber(
-		[]string{broker0.Addr()}, []string{testTopicName},
+		WithBrokers(broker0.Addr()),
+		WithTopics(testTopicName),
 		WithGroupName(testConsumerGroupName),
 	)
 	assert.NoError(t, err, `new subscriber`)
@@ -62,8 +63,8 @@ func Test_SubscriberReceiveMessages(t *testing.T) {
 	assert.NoError(t, err, `close connection`)
 }
 
-func Test_NewSubscriberError(t *testing.T) {
-	_, err := NewSubscriber(nil, nil,
+func TestNewSubscriberError(t *testing.T) {
+	_, err := NewSubscriber(
 		WithGroupName(``),
 		WithKafkaVersion(sarama.V0_10_0_0),
 		WithErrorHandler(func(msg nc.Message, err error) {}),

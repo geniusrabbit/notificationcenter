@@ -37,10 +37,11 @@ func NewSubscriber(timeInterval time.Duration, options ...Option) nc.Subscriber 
 // Listen kafka consumer
 func (s *interval) Listen(ctx context.Context) error {
 	s.ticker = time.NewTicker(s.timeInterval)
+loop:
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			break loop
 		case <-s.ticker.C:
 			if err := s.ProcessMessage(s.message()); err != nil {
 				return err

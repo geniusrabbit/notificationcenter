@@ -103,11 +103,12 @@ func Test_EventListening(t *testing.T) {
 	if err != nil {
 		t.Error(`invalid subscribe receiver`, err)
 	}
-	go subscriber.Listen(ctx)
+	go func() { _ = subscriber.Listen(ctx) }()
 
 	for i := 0; i <= testEventCount; i++ {
 		wg.Add(1)
-		db.Exec(testDataOperation)
+		_, err := db.Exec(testDataOperation)
+		assert.NoError(t, err, `INSERT test_notifies`)
 	}
 
 	wg.Wait()

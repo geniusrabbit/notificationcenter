@@ -54,7 +54,7 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 	if err != nil || conn == nil {
 		return nil, err
 	}
-	return &Subscriber{
+	sub := &Subscriber{
 		ModelSubscriber: nc.ModelSubscriber{
 			ErrorHandler: opts.ErrorHandler,
 			PanicHandler: opts.PanicHandler,
@@ -65,7 +65,8 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 		natsSubscriptions: opts.NatsSubscriptions,
 		closeEvent:        make(chan bool, 1),
 		logger:            opts.logger(),
-	}, nil
+	}
+	return sub, sub.subscribe()
 }
 
 // MustNewSubscriber creates new subscriber object
@@ -111,7 +112,7 @@ func (s *Subscriber) message(m *nstream.Msg) {
 
 // Close nstream client
 func (s *Subscriber) Close() error {
-	s.conn.Close()
+	err := s.conn.Close()
 	s.closeEvent <- true
-	return nil
+	return err
 }

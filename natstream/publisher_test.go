@@ -12,7 +12,7 @@ func TestNewPublisherPanic(t *testing.T) {
 		assert.NotNil(t, rec)
 	}()
 	pub := MustNewPublisher(WithNatsURL(`nats://demo?topics=test`))
-	pub.Close()
+	assert.NoError(t, pub.Close())
 }
 
 func TestNewPublisher(t *testing.T) {

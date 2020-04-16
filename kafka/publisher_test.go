@@ -15,7 +15,7 @@ type testMessage struct {
 	Title string `json:"title"`
 }
 
-func Test_Sending(t *testing.T) {
+func TestSending(t *testing.T) {
 	defaultCtx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -39,7 +39,9 @@ func Test_Sending(t *testing.T) {
 
 	// Connect the publisher
 	publisher := MustNewPublisher(
-		defaultCtx, []string{seedBroker.Addr()}, []string{"my_topic"},
+		defaultCtx,
+		WithBrokers(seedBroker.Addr()),
+		WithTopics(`my_topic`),
 		WithClientID("test"),
 		WithPublisherSuccessHandler(func(*sarama.ProducerMessage) { receiveChan <- nil }),
 		WithPublisherErrorHandler(func(err *sarama.ProducerError) { receiveChan <- err }),
@@ -72,12 +74,12 @@ loop:
 	assert.Equal(t, messageCount, successCount, "not all messages are success")
 }
 
-func Test_NewPublisherError(t *testing.T) {
-	_, err := NewPublisher(context.TODO(), nil, nil)
+func TestNewPublisherError(t *testing.T) {
+	_, err := NewPublisher(context.TODO())
 	assert.Error(t, err)
 }
 
-func Test_NewPublisherPanic(t *testing.T) {
+func TestNewPublisherPanic(t *testing.T) {
 	defer func() {
 		assert.True(t, recover() != nil)
 	}()

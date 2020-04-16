@@ -12,7 +12,8 @@ func TestNewSubscriberPanic(t *testing.T) {
 		assert.NotNil(t, rec)
 	}()
 	sub := MustNewSubscriber(WithNatsURL(`nats://demo`))
-	sub.Close()
+	err := sub.Close()
+	assert.NoError(t, err)
 }
 
 func TestNewSubscriber(t *testing.T) {

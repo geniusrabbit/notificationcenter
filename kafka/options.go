@@ -1,6 +1,9 @@
 package kafka
 
 import (
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -15,8 +18,18 @@ import (
 type Options struct {
 	ClusterConfig cluster.Config
 
+	// IsSynchronous type of producer
+	// TODO: make it work for sync publisher
+	IsSynchronous bool
+
+	// Brokers contains list of broker hosts with port
+	Brokers []string
+
 	// Name of the subscription group
 	GroupName string
+
+	// Names of topics for subscribing or publishing
+	Topics []string
 
 	// ErrorHandler of message processing
 	ErrorHandler nc.ErrorHandler
@@ -79,6 +92,36 @@ func WithSaramaConfig(streamConfig *sarama.Config) Option {
 	}
 }
 
+// WithKafkaURL is an Option to set the URL the client should connect to.
+// The url can contain username/password semantics. e.g. kafka://derek:pass@localhost:4222/{groupName}?topics=topic1,topic2
+// Comma separated arrays are also supported, e.g. urlA, urlB.
+func WithKafkaURL(urlString string) Option {
+	return func(opt *Options) {
+		u, err := url.Parse(urlString)
+		if err != nil {
+			panic(err)
+		}
+		if len(u.Path) > 1 {
+			opt.GroupName = u.Path[1:]
+		}
+		if isSync := u.Query().Get(`sync`); isSync != `` {
+			opt.IsSynchronous, _ = strconv.ParseBool(isSync)
+		}
+		topics := strings.Split(u.Query().Get(`topics`), `,`)
+		if len(topics) == 1 && topics[0] == `` {
+			topics = nil
+		}
+		if len(topics) > 0 {
+			opt.Topics = topics
+		}
+		opt.Brokers = strings.Split(u.Host, ",")
+		if u.User != nil && u.User.Username() != `` {
+			opt.clusterConfig().Net.SASL.User = u.User.Username()
+			opt.clusterConfig().Net.SASL.Password = u.User.Username()
+		}
+	}
+}
+
 // WithClientID value
 func WithClientID(clientID string) Option {
 	return func(options *Options) {
@@ -86,10 +129,24 @@ func WithClientID(clientID string) Option {
 	}
 }
 
+// WithBrokers overrides the list of brokers to connect
+func WithBrokers(brokers ...string) Option {
+	return func(options *Options) {
+		options.Brokers = brokers
+	}
+}
+
 // WithGroupName of the message consuming
 func WithGroupName(name string) Option {
 	return func(options *Options) {
 		options.GroupName = name
+	}
+}
+
+// WithTopics will set the list of topics for publishing or subscribing
+func WithTopics(topics ...string) Option {
+	return func(opt *Options) {
+		opt.Topics = topics
 	}
 }
 

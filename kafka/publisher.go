@@ -51,19 +51,19 @@ type Publisher struct {
 }
 
 // NewPublisher to the kafka with some brokers and topics for sending
-func NewPublisher(ctx context.Context, brokerList, topics []string, options ...Option) (*Publisher, error) {
+func NewPublisher(ctx context.Context, options ...Option) (*Publisher, error) {
 	var opts Options
 	opts.ClusterConfig.Config = *sarama.NewConfig()
 	for _, opt := range options {
 		opt(&opts)
 	}
-	producer, err := sarama.NewAsyncProducer(brokerList, opts.saramaConfig())
+	producer, err := sarama.NewAsyncProducer(opts.Brokers, opts.saramaConfig())
 	if err != nil {
 		return nil, err
 	}
 	pub := &Publisher{
 		producer:              producer,
-		topics:                topics,
+		topics:                opts.Topics,
 		encoder:               opts.encoder(),
 		errorHandler:          opts.ErrorHandler,
 		panicHandler:          opts.PanicHandler,
@@ -77,8 +77,8 @@ func NewPublisher(ctx context.Context, brokerList, topics []string, options ...O
 }
 
 // MustNewPublisher connection or panic
-func MustNewPublisher(ctx context.Context, brokerList, topics []string, options ...Option) *Publisher {
-	publisher, err := NewPublisher(ctx, brokerList, topics, options...)
+func MustNewPublisher(ctx context.Context, options ...Option) *Publisher {
+	publisher, err := NewPublisher(ctx, options...)
 	if err != nil {
 		panic(err)
 	}
@@ -145,7 +145,7 @@ loop:
 				p.successHandler(msg)
 			}
 			// Now we can to release the kafka buffer :)
-			msg.Value.(kafkaByteEncoder).Release()
+			msg.Value.(*kafkaByteEncoder).Release()
 		case <-ctx.Done():
 			break loop
 		}

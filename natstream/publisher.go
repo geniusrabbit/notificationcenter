@@ -92,6 +92,5 @@ func (s *Publisher) Publish(ctx context.Context, messages ...interface{}) (err e
 
 // Close nats-stream client
 func (s *Publisher) Close() error {
-	s.conn.Close()
-	return nil
+	return s.conn.Close()
 }

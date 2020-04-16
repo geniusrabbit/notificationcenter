@@ -44,7 +44,7 @@ import(
 
 ```go
 // Create new publisher processor
-eventStream, err = nats.NewPublisher([]string{"event"}, nats.WithNatsURL("nats://hostname:4222"))
+eventStream, err = nats.NewPublisher(nats.WithNatsURL("nats://hostname:4222/group?topics=event"))
 if err != nil {
   log.Fatal(err)
 }
@@ -77,7 +77,7 @@ import (
 
 func main() {
   ctx := context.Background()
-  events := nats.MustNewSubscriber([]string{"events"},
+  events := nats.MustNewSubscriber(nats.WithTopics("events"),
     nats.WithNatsURL("nats://connection"), nats.WithGroupName(`group`))
   nc.Register("events", events)
   nc.Register("refresh", interval.NewSubscriber(time.Minute * 5))

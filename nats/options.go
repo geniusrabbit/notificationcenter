@@ -80,7 +80,7 @@ func WithNatsConn(conn *nats.Conn) Option {
 }
 
 // WithNatsURL is an Option to set the URL the client should connect to.
-// The url can contain username/password semantics. e.g. nats://derek:pass@localhost:4222
+// The url can contain username/password semantics. e.g. nats://derek:pass@localhost:4222/{groupName}?topics=topic1,topic2
 // Comma separated arrays are also supported, e.g. urlA, urlB.
 func WithNatsURL(urlString string) Option {
 	return func(opt *Options) {
