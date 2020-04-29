@@ -114,6 +114,11 @@ lint: golint vet errcheck staticcheck
 test: ## Run package test
 	go test -race ./...
 
+.PHONY: tidy
+tidy: ## Run mod tidy
+	@echo "Run mod tidy"
+	go mod tidy
+
 .PHONY: godepup
 godepup: ## Update current dependencies to the last version
 	go get -u -v

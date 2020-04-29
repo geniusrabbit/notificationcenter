@@ -15,3 +15,8 @@ func (pub Publisher) Publish(ctx context.Context, messages ...interface{}) error
 	}
 	return nil
 }
+
+// Close dummy publisher
+func (pub Publisher) Close() error {
+	return nil
+}
