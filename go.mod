@@ -26,4 +26,5 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb // indirect
 	golang.org/x/crypto v0.0.0-20200427165652-729f1e841bcc // indirect
+	github.com/demdxx/rpool v0.0.0-20200317152850-d737c64d8aaf
 )

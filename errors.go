@@ -6,6 +6,11 @@ type multierror struct {
 	errs []error
 }
 
+// MultiError data type
+func MultiError(errors ...error) error {
+	return &multierror{errs: errors}
+}
+
 func (e *multierror) Error() string {
 	var buff bytes.Buffer
 	for i, err := range e.errs {
