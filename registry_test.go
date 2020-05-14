@@ -22,16 +22,14 @@ type registryTestSuite struct {
 	reg *Registry
 }
 
-func (suite *registryTestSuite) SetupSuite() {
-	suite.reg = DefaultRegistry
-}
+func (suite *registryTestSuite) SetupSuite() {}
 
 func (suite *registryTestSuite) TearDownSuite() {
-	suite.NoError(suite.reg.Close())
+	suite.NoError(Close())
 }
 
 func (suite *registryTestSuite) TestRegister() {
-	err := suite.reg.Register(
+	err := Register(
 		"test1", &testPublisher{},
 		"test2", &testSubscriber{},
 	)
@@ -39,24 +37,24 @@ func (suite *registryTestSuite) TestRegister() {
 }
 
 func (suite *registryTestSuite) TestNullPublisher() {
-	suite.Nil(suite.reg.Publisher("undefined"))
+	suite.Nil(PublisherByName("undefined"))
 }
 
 func (suite *registryTestSuite) TestNullSubsciber() {
-	suite.Nil(suite.reg.Subscriber("undefined"))
+	suite.Nil(SubscriberByName("undefined"))
 }
 
 func (suite *registryTestSuite) TestPublish() {
-	err := suite.reg.Register("test-pub-1", &testPublisher{})
+	err := Register("test-pub-1", &testPublisher{})
 	suite.NoError(err)
-	err = suite.reg.Publish(context.TODO(), "test-pub-1", "hi")
+	err = Publish(context.TODO(), "test-pub-1", "hi")
 	suite.NoError(err)
 }
 
 func (suite *registryTestSuite) TestSubscribe() {
-	err := suite.reg.Register("test-sub-1", &testSubscriber{})
+	err := Register("test-sub-1", &testSubscriber{})
 	suite.NoError(err)
-	err = suite.reg.Subscribe(context.TODO(), "test-sub-1",
+	err = Subscribe(context.TODO(), "test-sub-1",
 		FuncReceiver(func(msg Message) error { return nil }))
 	suite.NoError(err)
 }
