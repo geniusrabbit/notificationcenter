@@ -15,19 +15,17 @@ import (
 
 func TestConcurrency(t *testing.T) {
 	var (
-		mx       sync.Mutex
 		wg       sync.WaitGroup
 		lastErr  error
 		receiver = nc.FuncReceiver(func(msg nc.Message) error {
-			wg.Done()
 			if bytes.Equal([]byte(`error`), msg.Body()) {
 				return fmt.Errorf(`test error`)
 			}
+			wg.Done()
 			return nil
 		})
 		errWrapper = func(err error, msg nc.Message) {
-			mx.Lock()
-			defer mx.Unlock()
+			defer wg.Done()
 			lastErr = err
 		}
 		rc = WithWorkers(receiver, 10, errWrapper,

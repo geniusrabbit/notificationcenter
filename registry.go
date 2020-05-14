@@ -21,6 +21,7 @@ var (
 // Registry provides functionality of access to pub/sub
 // interfaces by string names.
 type Registry struct {
+	mx              sync.RWMutex
 	closeEventCount int32
 	closeEvent      chan bool
 	publishers      map[string]Publisher
@@ -38,11 +39,15 @@ func NewRegistry() *Registry {
 
 // Publisher returns pub interface by name if exists or Nil otherwise
 func (r *Registry) Publisher(name string) Publisher {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
 	return r.publishers[name]
 }
 
 // Subscriber returns sub interface by name if exists or Nil otherwise
 func (r *Registry) Subscriber(name string) Subscriber {
+	r.mx.RLock()
+	defer r.mx.RUnlock()
 	return r.subscribers[name]
 }
 
@@ -58,6 +63,8 @@ func (r *Registry) Subscriber(name string) Subscriber {
 // ```
 func (r *Registry) Register(params ...interface{}) error {
 	var name string
+	r.mx.Lock()
+	defer r.mx.Unlock()
 	for i, p := range params {
 		switch v := p.(type) {
 		case string:
@@ -104,6 +111,7 @@ func (r *Registry) Subscribe(ctx context.Context, name string, receiver Receiver
 // Listen runs subscribers listen interface
 func (r *Registry) Listen(ctx context.Context) (err error) {
 	var w sync.WaitGroup
+	r.mx.RLock()
 	for name, sub := range r.subscribers {
 		w.Add(1)
 		go func(ctx context.Context, name string, sub Subscriber) {
@@ -113,6 +121,7 @@ func (r *Registry) Listen(ctx context.Context) (err error) {
 			}
 		}(ctx, name, sub)
 	}
+	r.mx.RUnlock()
 	w.Wait()
 	return err
 }
@@ -120,6 +129,8 @@ func (r *Registry) Listen(ctx context.Context) (err error) {
 // Close notification center
 func (r *Registry) Close() error {
 	var errors []error
+	r.mx.Lock()
+	defer r.mx.Unlock()
 	for _, pub := range r.publishers {
 		if cl, ok := pub.(io.Closer); ok {
 			if err := cl.Close(); err != nil {
