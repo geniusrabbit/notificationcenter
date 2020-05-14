@@ -23,7 +23,7 @@ type registryTestSuite struct {
 }
 
 func (suite *registryTestSuite) SetupSuite() {
-	suite.reg = NewRegistry()
+	suite.reg = DefaultRegistry
 }
 
 func (suite *registryTestSuite) TearDownSuite() {
