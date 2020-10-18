@@ -29,7 +29,7 @@ func (m *message) Body() (d []byte) {
 	case string:
 		d = []byte(v)
 	default:
-		d, _ = json.Marshal(m)
+		d, _ = json.Marshal(m.v)
 	}
 	return d
 }
