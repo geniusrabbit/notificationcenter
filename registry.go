@@ -149,7 +149,7 @@ func (r *Registry) Close() error {
 		r.closeEvent <- true
 	}
 	if len(errors) > 0 {
-		return &multierror{errors}
+		return MultiError(errors...)
 	}
 	return nil
 }

@@ -37,12 +37,18 @@ func TestSending(t *testing.T) {
 	successCount := 0
 	receiveChan := make(chan error, messageCount)
 
+	config := sarama.NewConfig()
+	config.Version = sarama.MinVersion
+	config.Producer.Flush.Messages = messageCount
+	config.Producer.Return.Successes = true
+
 	// Connect the publisher
 	publisher := MustNewPublisher(
 		defaultCtx,
 		WithBrokers(seedBroker.Addr()),
 		WithTopics(`my_topic`),
 		WithClientID("test"),
+		WithSaramaConfig(config),
 		WithPublisherSuccessHandler(func(*sarama.ProducerMessage) { receiveChan <- nil }),
 		WithPublisherErrorHandler(func(err *sarama.ProducerError) { receiveChan <- err }),
 		WithCompression(sarama.CompressionNone, 0),

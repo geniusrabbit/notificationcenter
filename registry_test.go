@@ -19,7 +19,7 @@ func (p *testSubscriber) Close() error                                          
 
 type registryTestSuite struct {
 	suite.Suite
-	reg *Registry
+	// reg *Registry
 }
 
 func (suite *registryTestSuite) SetupSuite() {}
