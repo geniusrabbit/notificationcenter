@@ -15,6 +15,7 @@ func Hash(obj interface{}) string {
 		return ohasher.ObjectHash()
 	}
 	h := sha256.New()
-	h.Write([]byte(fmt.Sprintf("%v", obj)))
+	// Ignore error check...
+	_, _ = h.Write([]byte(fmt.Sprintf("%v", obj)))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
