@@ -18,7 +18,7 @@ var (
 	errReceiverAlreadyRegistered = errors.New("receiver already registered")
 )
 
-// Subscriber provides methods of working with subscribtion
+// Subscriber provides methods of working with subscription
 //go:generate mockgen -source $GOFILE -package mocks -destination mocks/subscriber.go
 type Subscriber interface {
 	io.Closer

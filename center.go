@@ -41,7 +41,7 @@ func Publish(ctx context.Context, name string, messages ...interface{}) error {
 	return DefaultRegistry.Publish(ctx, name, messages...)
 }
 
-// Subscribe new handler on some paticular subscriber interface by name
+// Subscribe new handler on some particular subscriber interface by name
 func Subscribe(ctx context.Context, name string, receiver Receiver) error {
 	return DefaultRegistry.Subscribe(ctx, name, receiver)
 }

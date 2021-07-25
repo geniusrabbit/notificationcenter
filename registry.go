@@ -100,7 +100,7 @@ func (r *Registry) Publish(ctx context.Context, name string, messages ...interfa
 	return pub.Publish(ctx, messages...)
 }
 
-// Subscribe new handler on some paticular subscriber interface by name
+// Subscribe new handler on some particular subscriber interface by name
 func (r *Registry) Subscribe(ctx context.Context, name string, receiver Receiver) error {
 	if sub := r.Subscriber(name); sub != nil {
 		return sub.Subscribe(ctx, receiver)
