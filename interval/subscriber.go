@@ -43,7 +43,7 @@ loop:
 		case <-ctx.Done():
 			break loop
 		case <-s.ticker.C:
-			if err := s.ProcessMessage(s.message()); err != nil {
+			if err := s.ProcessMessage(s.message(ctx)); err != nil {
 				return err
 			}
 		}
@@ -51,8 +51,8 @@ loop:
 	return nil
 }
 
-func (s *interval) message() *message {
-	return &message{s.msgFnk()}
+func (s *interval) message(ctx context.Context) *message {
+	return &message{ctx: ctx, v: s.msgFnk()}
 }
 
 // Close nstream client

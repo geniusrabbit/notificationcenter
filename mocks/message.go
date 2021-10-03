@@ -1,15 +1,23 @@
 package mocks
 
+import "context"
+
 // Message simple object for testing reasons
 type Message struct {
+	ctx  context.Context
 	id   string
 	body []byte
 	err  error
 }
 
 // NewMessage object constructor
-func NewMessage(id string, body []byte, ackErr error) *Message {
-	return &Message{id: id, body: body, err: ackErr}
+func NewMessage(ctx context.Context, id string, body []byte, ackErr error) *Message {
+	return &Message{ctx: ctx, id: id, body: body, err: ackErr}
+}
+
+// Context of the message
+func (m *Message) Context() context.Context {
+	return m.ctx
 }
 
 // ID Unical message ID (depends on transport)

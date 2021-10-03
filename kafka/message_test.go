@@ -20,6 +20,7 @@ func TestMessage(t *testing.T) {
 	}
 	assert.Equal(t, []byte(`{"data": "test"}`), msg.Body())
 	assert.Equal(t, ``, msg.ID())
+	assert.Nil(t, msg.Context())
 	assert.Error(t, msg.Ack())
 }
 

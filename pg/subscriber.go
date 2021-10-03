@@ -100,7 +100,7 @@ loop:
 		select {
 		case n := <-s.listener.Notify:
 			s.logger.Debugf("Received data from channel [%s]", n.Channel)
-			err = s.ProcessMessage((*message)(n))
+			err = s.ProcessMessage(fromPgNotify(ctx, n))
 		case <-time.After(90 * time.Second):
 			s.logger.Info("Received no events for 90 seconds, checking connection")
 			err = s.listener.Ping()

@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"context"
 	"net/url"
 	"strings"
 
@@ -13,6 +14,8 @@ import (
 
 // Options of the NATS wrapper
 type Options struct {
+	Ctx context.Context
+
 	// Inited NATS connection
 	Conn *nats.Conn
 
@@ -60,6 +63,13 @@ func (opt *Options) group() string {
 		return `default`
 	}
 	return opt.GroupName
+}
+
+func (opt *Options) context() context.Context {
+	if opt.Ctx == nil {
+		return context.Background()
+	}
+	return opt.Ctx
 }
 
 func (opt *Options) logger() loggerInterface {
@@ -153,6 +163,13 @@ func WithNkey(pubKey string, sigCB nats.SignatureHandler) Option {
 func WithGroupName(name string) Option {
 	return func(opt *Options) {
 		opt.GroupName = name
+	}
+}
+
+// WithContext puts the client context value
+func WithContext(ctx context.Context) Option {
+	return func(opt *Options) {
+		opt.Ctx = ctx
 	}
 }
 

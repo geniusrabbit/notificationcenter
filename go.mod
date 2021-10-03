@@ -1,13 +1,14 @@
 module github.com/geniusrabbit/notificationcenter
 
-go 1.14
+go 1.15
 
 require (
 	github.com/Shopify/sarama v1.29.1
-	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/alicebob/miniredis v2.5.0+incompatible
+	github.com/alicebob/miniredis/v2 v2.15.1
 	github.com/allegro/bigcache v1.2.1
 	github.com/bsm/sarama-cluster v2.1.15+incompatible
+	github.com/demdxx/gocast v1.0.1
 	github.com/demdxx/rpool v0.0.0-20200317152850-d737c64d8aaf
 	github.com/elliotchance/redismock v1.5.3
 	github.com/go-redis/redis v6.15.9+incompatible
@@ -21,4 +22,5 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
 	github.com/yuin/gopher-lua v0.0.0-20210529063254-f4c35e4016d9 // indirect
+	go.uber.org/multierr v1.7.0
 )

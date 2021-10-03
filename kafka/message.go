@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"context"
 	"errors"
 
 	"github.com/Shopify/sarama"
@@ -11,8 +12,14 @@ import (
 var ErrMessageInvalidConsumer = errors.New(`[message] invalid consumer`)
 
 type message struct {
+	ctx      context.Context
 	msg      *sarama.ConsumerMessage
 	consumer *cluster.Consumer
+}
+
+// Context of the message
+func (m *message) Context() context.Context {
+	return m.ctx
 }
 
 // ID returns unical message ID (depends on transport)

@@ -1,6 +1,7 @@
 package natstream
 
 import (
+	"context"
 	"math/rand"
 	"net/url"
 	"strings"
@@ -13,8 +14,15 @@ import (
 	"github.com/geniusrabbit/notificationcenter/internal/logger"
 )
 
+type loggerInterface interface {
+	Error(params ...interface{})
+	Debugf(msg string, params ...interface{})
+}
+
 // Options of the NATS wrapper
 type Options struct {
+	Ctx context.Context
+
 	// Raw options from the "github.com/nats-io/stan.go" module
 	NatsOptions []nstream.Option
 
@@ -65,6 +73,13 @@ func (opt *Options) group() string {
 		return `default`
 	}
 	return opt.GroupName
+}
+
+func (opt *Options) context() context.Context {
+	if opt.Ctx == nil {
+		return context.Background()
+	}
+	return opt.Ctx
 }
 
 func (opt *Options) clusterID() string {
@@ -141,6 +156,13 @@ func WithClientID(id string) Option {
 func WithGroupName(name string) Option {
 	return func(opt *Options) {
 		opt.GroupName = name
+	}
+}
+
+// WithContext puts the client context value
+func WithContext(ctx context.Context) Option {
+	return func(opt *Options) {
+		opt.Ctx = ctx
 	}
 }
 

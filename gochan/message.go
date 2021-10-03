@@ -1,7 +1,15 @@
 package gochan
 
+import "context"
+
 type message struct {
+	ctx  context.Context
 	data []byte
+}
+
+// Context of the message
+func (m message) Context() context.Context {
+	return m.ctx
 }
 
 // Unical message ID (depends on transport)

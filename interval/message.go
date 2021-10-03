@@ -1,6 +1,7 @@
 package interval
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 )
@@ -13,7 +14,13 @@ type messageValue interface {
 }
 
 type message struct {
-	v interface{}
+	ctx context.Context
+	v   interface{}
+}
+
+// Context of the message
+func (m *message) Context() context.Context {
+	return m.ctx
 }
 
 // Unical message ID (depends on transport)

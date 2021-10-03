@@ -1,17 +1,17 @@
-package nats
+package redis
 
 import (
 	"context"
 
-	nats "github.com/nats-io/nats.go"
+	"github.com/go-redis/redis"
 )
 
 type message struct {
 	ctx context.Context
-	msg *nats.Msg
+	msg *redis.Message
 }
 
-func messageFromNats(ctx context.Context, msg *nats.Msg) *message {
+func messageFromRedis(ctx context.Context, msg *redis.Message) *message {
 	return &message{ctx: ctx, msg: msg}
 }
 
@@ -27,7 +27,10 @@ func (m *message) ID() string {
 
 // Body returns message data as bytes
 func (m *message) Body() []byte {
-	return m.msg.Data
+	if m == nil || m.msg == nil {
+		return nil
+	}
+	return []byte(m.msg.Payload)
 }
 
 // Acknowledgment of the message processing

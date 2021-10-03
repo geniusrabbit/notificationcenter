@@ -23,15 +23,15 @@ export PATH := $(GOBIN):$(PATH)
 # https://golang.org/doc/go1.12#tls_1_3
 export GODEBUG := tls13=0
 
-GOLINT_VERSION := d0100b6bd8b389f0385611eb39152c4d7c3a7905
-GOLINT := $(TMP_VERSIONS)/golint/$(GOLINT_VERSION)
-$(GOLINT):
-	$(eval GOLINT_TMP := $(shell mktemp -d))
-	cd $(GOLINT_TMP); go get golang.org/x/lint/golint@$(GOLINT_VERSION)
-	@rm -rf $(GOLINT_TMP)
-	@rm -rf $(dir $(GOLINT))
-	@mkdir -p $(dir $(GOLINT))
-	@touch $(GOLINT)
+GOLANGLINTCI_VERSION := latest
+GOLANGLINTCI := $(TMP_VERSIONS)/golangci-lint/$(GOLANGLINTCI_VERSION)
+$(GOLANGLINTCI):
+	$(eval GOLANGLINTCI_TMP := $(shell mktemp -d))
+	cd $(GOLANGLINTCI_TMP); go get github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGLINTCI_VERSION)
+	@rm -rf $(GOLANGLINTCI_TMP)
+	@rm -rf $(dir $(GOLANGLINTCI))
+	@mkdir -p $(dir $(GOLANGLINTCI))
+	@touch $(GOLANGLINTCI)
 
 ERRCHECK_VERSION := v1.2.0
 ERRCHECK := $(TMP_VERSIONS)/errcheck/$(ERRCHECK_VERSION)
@@ -84,31 +84,20 @@ $(GOMOCK):
 	@touch $(GOMOCK)
 
 .PHONY: deps
-deps: $(GOLINT) $(ERRCHECK) $(STATICCHECK) $(CERTSTRAP) $(GOMOCK)
+deps: $(GOLANGLINTCI) $(ERRCHECK) $(STATICCHECK) $(CERTSTRAP) $(GOMOCK)
 
 .PHONY: generate-code
 generate-code: ## Generate mocks for the project
 	@echo "Generate mocks for the project"
 	@go generate ./...
 
-.PHONY: golint
-golint: $(GOLINT)
-	golint -set_exit_status ./...
-
-.PHONY: vet
-vet:
-	go vet ./...
-
-.PHONY:
-errcheck: $(ERRCHECK)
-	errcheck ./...
-
-.PHONY: staticcheck
-staticcheck: $(STATICCHECK)
-	staticcheck ./...
-
 .PHONY: lint
-lint: golint vet errcheck staticcheck
+lint: golint
+
+.PHONY: golint
+golint: $(GOLANGLINTCI)
+	# golint -set_exit_status ./...
+	golangci-lint run -v ./...
 
 .PHONY: test
 test: ## Run package test

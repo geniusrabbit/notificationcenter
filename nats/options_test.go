@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,4 +26,7 @@ func TestOptionWithURL(t *testing.T) {
 	WithNatsURL(`nats://demo:4222/test?topics=topic1,topic2`)(&options)
 	assert.ElementsMatch(t, []string{`topic1`, `topic2`}, options.Topics)
 	assert.Equal(t, `test`, options.group())
+
+	WithContext(context.Background())(&options)
+	assert.NotNil(t, options.context(), `context`)
 }

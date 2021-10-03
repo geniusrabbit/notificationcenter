@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"sync"
@@ -38,7 +39,7 @@ func TestConcurrency(t *testing.T) {
 		if i == 73 {
 			body = []byte(`error`)
 		}
-		err := rc.Receive(mocks.NewMessage(`test`, body, nil))
+		err := rc.Receive(mocks.NewMessage(context.TODO(), `test`, body, nil))
 		assert.NoError(t, err, `receive message`)
 	}
 

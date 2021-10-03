@@ -21,6 +21,7 @@ type loggerInterface interface {
 // Subscriber for NATS queue
 type Subscriber struct {
 	notificationcenter.ModelSubscriber
+	ctx context.Context
 
 	// Group name
 	group string
@@ -57,6 +58,7 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 			ErrorHandler: opts.ErrorHandler,
 			PanicHandler: opts.PanicHandler,
 		},
+		ctx:        opts.context(),
 		group:      opts.group(),
 		topics:     opts.Topics,
 		conn:       conn,
@@ -77,6 +79,7 @@ func MustNewSubscriber(options ...Option) *Subscriber {
 
 // Listen kafka consumer
 func (s *Subscriber) Listen(ctx context.Context) error {
+	s.ctx = ctx
 	select {
 	case <-ctx.Done():
 	case <-s.closeEvent:
@@ -102,7 +105,7 @@ func (s *Subscriber) subscribe() (err error) {
 
 // message execute
 func (s *Subscriber) message(m *nats.Msg) {
-	if err := s.ProcessMessage((*message)(m)); err != nil {
+	if err := s.ProcessMessage(messageFromNats(s.ctx, m)); err != nil {
 		s.logger.Error(err)
 	}
 }

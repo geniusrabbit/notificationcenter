@@ -1,12 +1,25 @@
 package pg
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/lib/pq"
 )
 
-type message pq.Notification
+type message struct {
+	ctx    context.Context
+	notify *pq.Notification
+}
+
+func fromPgNotify(ctx context.Context, notify *pq.Notification) *message {
+	return &message{ctx: ctx, notify: notify}
+}
+
+// Context of the message
+func (m *message) Context() context.Context {
+	return m.ctx
+}
 
 // Unical message ID (depends on transport)
 func (m *message) ID() string {
@@ -26,5 +39,5 @@ func (m *message) Ack() error {
 
 // Notification type of message
 func (m *message) Notification() *pq.Notification {
-	return (*pq.Notification)(m)
+	return m.notify
 }

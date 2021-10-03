@@ -26,6 +26,7 @@ simplify writing pub/sub-services.
   - [NATS](nats)
   - [NATS Stream](natstream)
   - [PostgreSQL](pg)
+  - [Redis](redis)
   - [Golang Chanels implementation](gochan)
   - [Golang time interval executor](interval)
 - [TODO](#todo)
@@ -101,7 +102,7 @@ func main() {
 ## TODO
 
 * [ ] Add support Amazon SQS queue
-* [ ] Add support Redis queue
+* [X] Add support Redis queue
 * [ ] Add support RabbitMQ queue
 * [ ] Add support MySQL notifications queue
 * [X] Add support PostgreSQL notifications queue

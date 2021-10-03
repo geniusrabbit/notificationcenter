@@ -73,7 +73,7 @@ loop:
 			if !ok {
 				break loop
 			}
-			m := &message{msg: msg, consumer: s.consumer}
+			m := &message{ctx: ctx, msg: msg, consumer: s.consumer}
 			if err := s.ProcessMessage(m); err != nil {
 				s.logger.Error(err)
 			}

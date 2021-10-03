@@ -25,7 +25,7 @@ type Publisher struct {
 // Publish one or more messages to the pub-service
 func (p Publisher) Publish(ctx context.Context, messages ...interface{}) error {
 	for _, msg := range messages {
-		if err := p.proxy.write(msg); err != nil {
+		if err := p.proxy.write(ctx, msg); err != nil {
 			return err
 		}
 	}
@@ -55,12 +55,12 @@ func (p *Proxy) Publisher() Publisher {
 	return Publisher{proxy: p}
 }
 
-func (p *Proxy) write(msg interface{}) error {
+func (p *Proxy) write(ctx context.Context, msg interface{}) error {
 	buff := &bytes.Buffer{}
 	if err := p.encoder(msg, buff); err != nil {
 		return err
 	}
-	p.pool <- message{data: buff.Bytes()}
+	p.pool <- message{ctx: ctx, data: buff.Bytes()}
 	return nil
 }
 

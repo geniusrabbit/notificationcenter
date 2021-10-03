@@ -13,14 +13,12 @@ import (
 	nc "github.com/geniusrabbit/notificationcenter"
 )
 
-type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
-}
-
 // Subscriber for NATS queue
 type Subscriber struct {
 	nc.ModelSubscriber
+
+	// Context value of the client
+	ctx context.Context
 
 	// Additional options for subscribers
 	natsSubscriptionOptions []nstream.SubscriptionOption
@@ -59,6 +57,7 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 			ErrorHandler: opts.ErrorHandler,
 			PanicHandler: opts.PanicHandler,
 		},
+		ctx:               opts.context(),
 		conn:              conn,
 		group:             opts.group(),
 		topics:            opts.Topics,
@@ -105,7 +104,7 @@ func (s *Subscriber) subscribe() (err error) {
 
 // message execute
 func (s *Subscriber) message(m *nstream.Msg) {
-	if err := s.ProcessMessage(messageFromNats(m)); err != nil {
+	if err := s.ProcessMessage(messageFromNats(s.ctx, m)); err != nil {
 		s.logger.Error(err)
 	}
 }
