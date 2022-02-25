@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2015, 2019 - 2020
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2020
+// @project geniusrabbit.com 2015, 2019 - 2022
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2022
 //
 
 package kafka
@@ -10,17 +10,13 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	cluster "github.com/bsm/sarama-cluster"
-	"github.com/geniusrabbit/notificationcenter"
+	"github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {
 	Error(params ...any)
 	Debugf(msg string, params ...any)
 }
-
-// SubscriberNotificationHandler callback function
-type SubscriberNotificationHandler func(notification *cluster.Notification)
 
 // Subscriber for kafka
 type Subscriber struct {
@@ -29,11 +25,7 @@ type Subscriber struct {
 	topics []string
 
 	// consumer object which receive the messages
-	// consumer      *cluster.Consumer
 	consumerGroup sarama.ConsumerGroup
-
-	// notificationHandler callback
-	notificationHandler SubscriberNotificationHandler
 
 	// logger interface
 	logger loggerInterface

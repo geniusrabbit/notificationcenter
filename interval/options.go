@@ -1,7 +1,7 @@
 package interval
 
 import (
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type handler func() any

@@ -11,7 +11,7 @@ import (
 
 	"github.com/lib/pq"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {

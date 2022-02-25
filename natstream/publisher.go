@@ -10,9 +10,9 @@ import (
 
 	nstream "github.com/nats-io/stan.go"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/bytebuffer"
 )
 
 // Publisher for NATS queue

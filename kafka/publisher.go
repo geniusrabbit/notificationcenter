@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2015, 2019 - 2020
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2020
+// @project geniusrabbit.com 2015, 2019 - 2022
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2022
 //
 
 // Config example
@@ -16,9 +16,9 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/bytebuffer"
 )
 
 // PublisherErrorHandler callback function

@@ -1,4 +1,4 @@
-module github.com/geniusrabbit/notificationcenter
+module github.com/geniusrabbit/notificationcenter/v2
 
 go 1.18
 
@@ -6,9 +6,8 @@ require (
 	github.com/Shopify/sarama v1.32.0
 	github.com/alicebob/miniredis/v2 v2.15.1
 	github.com/allegro/bigcache v1.2.1
-	github.com/bsm/sarama-cluster v2.1.15+incompatible
-	github.com/demdxx/gocast v1.0.1
-	github.com/demdxx/rpool v0.0.0-20200317152850-d737c64d8aaf
+	github.com/demdxx/gocast v1.2.0
+	github.com/demdxx/rpool/v2 v2.0.1
 	github.com/elliotchance/redismock/v8 v8.11.0
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/golang/mock v1.6.0

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type interval struct {

@@ -5,10 +5,9 @@ import (
 	"testing"
 
 	"github.com/Shopify/sarama"
-	cluster "github.com/bsm/sarama-cluster"
 	"github.com/stretchr/testify/assert"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 const (
@@ -69,7 +68,6 @@ func TestNewSubscriberError(t *testing.T) {
 		WithKafkaVersion(sarama.V0_10_0_0),
 		WithErrorHandler(func(msg nc.Message, err error) {}),
 		WithPanicHandler(func(msg nc.Message, recoverData any) {}),
-		WithSubscriberNotificationHandler(func(notification *cluster.Notification) {}),
 	)
 	assert.Error(t, err)
 }

@@ -8,9 +8,9 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/logger"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
 )
 
 // Options for publisher or subscriber
@@ -41,9 +41,6 @@ type Options struct {
 
 	// PublisherSuccessHandler provides handler of message send success
 	PublisherSuccessHandler PublisherSuccessHandler
-
-	// SubscriberNotificationHandler provides handler of received messages
-	SubscriberNotificationHandler SubscriberNotificationHandler
 
 	// Message encoder interface
 	Encoder encoder.Encoder
@@ -205,12 +202,5 @@ func WithPublisherSuccessHandler(h PublisherSuccessHandler) Option {
 	return func(options *Options) {
 		options.ClusterConfig.Producer.Return.Successes = h != nil
 		options.PublisherSuccessHandler = h
-	}
-}
-
-// WithSubscriberNotificationHandler set handler of the cluster group notifications
-func WithSubscriberNotificationHandler(h SubscriberNotificationHandler) Option {
-	return func(options *Options) {
-		options.SubscriberNotificationHandler = h
 	}
 }

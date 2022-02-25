@@ -1,6 +1,6 @@
 package concurrency
 
-import "github.com/demdxx/rpool"
+import "github.com/demdxx/rpool/v2"
 
 // Option func type which adjust option values
 type Option func() rpool.Option

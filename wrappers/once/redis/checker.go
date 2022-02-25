@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/geniusrabbit/notificationcenter/internal/objecthash"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/objecthash"
 	"github.com/go-redis/redis/v8"
 )
 

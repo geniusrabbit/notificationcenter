@@ -3,9 +3,9 @@ package redis
 import (
 	"testing"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/logger"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 )

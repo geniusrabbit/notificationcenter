@@ -102,9 +102,9 @@ func (r *Registry) Publish(ctx context.Context, name string, messages ...any) er
 }
 
 // Subscribe new handler on some particular subscriber interface by name
-func (r *Registry) Subscribe(ctx context.Context, name string, receiver Receiver) error {
+func (r *Registry) Subscribe(ctx context.Context, name string, receiver any) error {
 	if sub := r.Subscriber(name); sub != nil {
-		return sub.Subscribe(ctx, receiver)
+		return sub.Subscribe(ctx, ReceiverFrom(receiver))
 	}
 	return errors.Wrap(ErrUndefinedSubscriberInterface, name)
 }

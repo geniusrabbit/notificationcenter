@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 // PublisherWrapper provides additional check before send message to the stream

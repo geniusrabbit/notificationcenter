@@ -6,7 +6,7 @@ package mocks
 
 import (
 	context "context"
-	notificationcenter "github.com/geniusrabbit/notificationcenter"
+	notificationcenter "github.com/geniusrabbit/notificationcenter/v2"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )

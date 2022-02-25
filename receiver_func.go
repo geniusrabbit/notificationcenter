@@ -4,8 +4,9 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/geniusrabbit/notificationcenter/decoder"
 	"github.com/pkg/errors"
+
+	"github.com/geniusrabbit/notificationcenter/v2/decoder"
 )
 
 var errInvalidReturnType = errors.New("invalid return types")
@@ -15,8 +16,12 @@ func ReceiverFrom(handler any) Receiver {
 	switch h := handler.(type) {
 	case Receiver:
 		return h
+	case func() error:
+		return FuncReceiver(func(msg Message) error { h(); return msg.Ack() })
 	case func(msg Message) error:
 		return FuncReceiver(h)
+	case func(ctx context.Context, msg Message) error:
+		return FuncReceiver(func(msg Message) error { return h(msg.Context(), msg) })
 	default:
 		return ExtFuncReceiver(h)
 	}

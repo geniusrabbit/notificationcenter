@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"io"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 func jsonEncoder(msg any, wr io.Writer) error {

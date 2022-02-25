@@ -82,8 +82,8 @@ AFTER INSERT OR UPDATE OR DELETE ON products
 
 ```go
 import (
-  nc "github.com/geniusrabbit/notificationcenter"
-  "github.com/geniusrabbit/notificationcenter/pg"
+  nc "github.com/geniusrabbit/notificationcenter/v2"
+  "github.com/geniusrabbit/notificationcenter/v2/pg"
 )
 
 const connectionDNS = "postgres://connection"

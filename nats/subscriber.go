@@ -10,7 +10,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
-	"github.com/geniusrabbit/notificationcenter"
+	"github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {

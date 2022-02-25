@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/allegro/bigcache"
-	"github.com/geniusrabbit/notificationcenter/internal/objecthash"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/objecthash"
 )
 
 // Checker provides inmemory messages test

@@ -42,7 +42,7 @@ func Publish(ctx context.Context, name string, messages ...any) error {
 }
 
 // Subscribe new handler on some particular subscriber interface by name
-func Subscribe(ctx context.Context, name string, receiver Receiver) error {
+func Subscribe(ctx context.Context, name string, receiver any) error {
 	return DefaultRegistry.Subscribe(ctx, name, receiver)
 }
 

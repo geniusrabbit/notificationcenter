@@ -8,7 +8,7 @@ import (
 	"time"
 
 	miniredis "github.com/alicebob/miniredis/v2"
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/stretchr/testify/assert"
 )
 
