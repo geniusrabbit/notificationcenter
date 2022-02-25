@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	cluster "github.com/bsm/sarama-cluster"
 
 	nc "github.com/geniusrabbit/notificationcenter"
 	"github.com/geniusrabbit/notificationcenter/encoder"
@@ -16,7 +15,7 @@ import (
 
 // Options for publisher or subscriber
 type Options struct {
-	ClusterConfig cluster.Config
+	ClusterConfig sarama.Config
 
 	// IsSynchronous type of producer
 	// TODO: make it work for sync publisher
@@ -53,12 +52,12 @@ type Options struct {
 	Logger loggerInterface
 }
 
-func (opt *Options) clusterConfig() *cluster.Config {
+func (opt *Options) clusterConfig() *sarama.Config {
 	return &opt.ClusterConfig
 }
 
 func (opt *Options) saramaConfig() *sarama.Config {
-	return &opt.ClusterConfig.Config
+	return &opt.ClusterConfig
 }
 
 func (opt *Options) encoder() encoder.Encoder {
@@ -88,7 +87,7 @@ type Option func(options *Options)
 // WithSaramaConfig custom config
 func WithSaramaConfig(streamConfig *sarama.Config) Option {
 	return func(options *Options) {
-		options.ClusterConfig.Config = *streamConfig
+		options.ClusterConfig = *streamConfig
 	}
 }
 
@@ -125,7 +124,7 @@ func WithKafkaURL(urlString string) Option {
 // WithClientID value
 func WithClientID(clientID string) Option {
 	return func(options *Options) {
-		options.ClusterConfig.Config.ClientID = clientID
+		options.ClusterConfig.ClientID = clientID
 	}
 }
 
@@ -212,14 +211,6 @@ func WithPublisherSuccessHandler(h PublisherSuccessHandler) Option {
 // WithSubscriberNotificationHandler set handler of the cluster group notifications
 func WithSubscriberNotificationHandler(h SubscriberNotificationHandler) Option {
 	return func(options *Options) {
-		options.ClusterConfig.Group.Return.Notifications = h != nil
 		options.SubscriberNotificationHandler = h
-	}
-}
-
-// WithClusterConfig custom config
-func WithClusterConfig(clusterConfig *cluster.Config) Option {
-	return func(options *Options) {
-		options.ClusterConfig = *clusterConfig
 	}
 }

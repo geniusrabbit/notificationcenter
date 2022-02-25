@@ -8,12 +8,12 @@ import (
 	nc "github.com/geniusrabbit/notificationcenter"
 	"github.com/geniusrabbit/notificationcenter/encoder"
 	"github.com/geniusrabbit/notificationcenter/internal/logger"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Option of the Redis subscriber or publisher

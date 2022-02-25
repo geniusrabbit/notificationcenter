@@ -12,7 +12,7 @@ type interval struct {
 
 	timeInterval time.Duration
 	ticker       *time.Ticker
-	msgFnk       func() interface{}
+	msgFnk       func() any
 }
 
 // NewSubscriber with interval message generation
@@ -22,7 +22,7 @@ func NewSubscriber(timeInterval time.Duration, options ...Option) nc.Subscriber 
 		opt(&opts)
 	}
 	if opts.Handler == nil {
-		opts.Handler = func() interface{} { return struct{}{} }
+		opts.Handler = func() any { return struct{}{} }
 	}
 	return &interval{
 		ModelSubscriber: nc.ModelSubscriber{

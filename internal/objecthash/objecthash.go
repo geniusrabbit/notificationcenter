@@ -10,7 +10,7 @@ type objectHash interface {
 }
 
 // Hash value from the object
-func Hash(obj interface{}) string {
+func Hash(obj any) string {
 	if ohasher, ok := obj.(objectHash); ok {
 		return ohasher.ObjectHash()
 	}

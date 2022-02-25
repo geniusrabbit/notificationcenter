@@ -13,7 +13,7 @@ func WithWorkerPoolSize(size int) Option {
 }
 
 // WithRecoverHandler defined error handler
-func WithRecoverHandler(f func(interface{})) Option {
+func WithRecoverHandler(f func(any)) Option {
 	return func() rpool.Option {
 		return rpool.WithRecoverHandler(f)
 	}

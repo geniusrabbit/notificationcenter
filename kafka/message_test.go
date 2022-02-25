@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"context"
 	"encoding/json"
 	"math/rand"
 	"sync"
@@ -13,15 +14,26 @@ import (
 	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
 )
 
+type testGroupSession struct{}
+
+func (*testGroupSession) Claims() map[string][]int32                                               { return nil }
+func (*testGroupSession) MemberID() string                                                         { return "" }
+func (*testGroupSession) GenerationID() int32                                                      { return 0 }
+func (*testGroupSession) MarkOffset(topic string, partition int32, offset int64, metadata string)  {}
+func (*testGroupSession) Commit()                                                                  {}
+func (*testGroupSession) ResetOffset(topic string, partition int32, offset int64, metadata string) {}
+func (*testGroupSession) MarkMessage(msg *sarama.ConsumerMessage, metadata string)                 {}
+func (*testGroupSession) Context() context.Context                                                 { return nil }
+
 func TestMessage(t *testing.T) {
 	msg := &message{
-		msg:      &sarama.ConsumerMessage{Value: []byte(`{"data": "test"}`)},
-		consumer: nil,
+		msg:     &sarama.ConsumerMessage{Value: []byte(`{"data": "test"}`)},
+		session: &testGroupSession{},
 	}
 	assert.Equal(t, []byte(`{"data": "test"}`), msg.Body())
 	assert.Equal(t, ``, msg.ID())
 	assert.Nil(t, msg.Context())
-	assert.Error(t, msg.Ack())
+	assert.Nil(t, msg.Ack())
 }
 
 func TestAsyncEncode(t *testing.T) {

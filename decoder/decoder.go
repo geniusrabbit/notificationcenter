@@ -6,14 +6,14 @@ import (
 )
 
 // Decoder function type
-type Decoder func(data []byte, msg interface{}) error
+type Decoder func(data []byte, msg any) error
 
 // JSON decoder implementation
-func JSON(data []byte, msg interface{}) error {
+func JSON(data []byte, msg any) error {
 	return json.Unmarshal(data, msg)
 }
 
 // XML decoder implementation
-func XML(data []byte, msg interface{}) error {
+func XML(data []byte, msg any) error {
 	return xml.Unmarshal(data, msg)
 }

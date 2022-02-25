@@ -53,7 +53,7 @@ type Publisher struct {
 // NewPublisher to the kafka with some brokers and topics for sending
 func NewPublisher(ctx context.Context, options ...Option) (*Publisher, error) {
 	var opts Options
-	opts.ClusterConfig.Config = *sarama.NewConfig()
+	opts.ClusterConfig = *sarama.NewConfig()
 	for _, opt := range options {
 		opt(&opts)
 	}
@@ -90,7 +90,7 @@ func MustNewPublisher(ctx context.Context, options ...Option) *Publisher {
 ///////////////////////////////////////////////////////////////////////////////
 
 // Publish one or more messages to the pub-service
-func (p *Publisher) Publish(ctx context.Context, messages ...interface{}) (err error) {
+func (p *Publisher) Publish(ctx context.Context, messages ...any) (err error) {
 	buff := bytebuffer.AcquireBuffer()
 	defer func() {
 		bytebuffer.ReleaseBuffer(buff)

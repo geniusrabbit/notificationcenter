@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 
 	nc "github.com/geniusrabbit/notificationcenter"
 )
@@ -67,7 +67,7 @@ func (s *Subscriber) Listen(ctx context.Context) error {
 }
 
 func (s *Subscriber) subscribe(ctx context.Context) {
-	s.sub = s.cli.Subscribe(s.channels...)
+	s.sub = s.cli.Subscribe(ctx, s.channels...)
 	for msg := range s.sub.Channel() {
 		s.message(ctx, msg)
 	}

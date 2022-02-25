@@ -68,7 +68,7 @@ func TestNewSubscriberError(t *testing.T) {
 		WithGroupName(``),
 		WithKafkaVersion(sarama.V0_10_0_0),
 		WithErrorHandler(func(msg nc.Message, err error) {}),
-		WithPanicHandler(func(msg nc.Message, recoverData interface{}) {}),
+		WithPanicHandler(func(msg nc.Message, recoverData any) {}),
 		WithSubscriberNotificationHandler(func(notification *cluster.Notification) {}),
 	)
 	assert.Error(t, err)

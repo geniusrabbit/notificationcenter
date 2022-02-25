@@ -42,7 +42,7 @@ func (m *MockReceiver) Receive(msg notificationcenter.Message) error {
 }
 
 // Receive indicates an expected call of Receive
-func (mr *MockReceiverMockRecorder) Receive(msg interface{}) *gomock.Call {
+func (mr *MockReceiverMockRecorder) Receive(msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Receive", reflect.TypeOf((*MockReceiver)(nil).Receive), msg)
 }

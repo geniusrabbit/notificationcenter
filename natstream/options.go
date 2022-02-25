@@ -15,8 +15,8 @@ import (
 )
 
 type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Options of the NATS wrapper

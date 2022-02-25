@@ -32,7 +32,7 @@ func (r *receiver) Receive(msg nc.Message) error {
 	return nil
 }
 
-func (r *receiver) executor(msg interface{}) {
+func (r *receiver) executor(msg any) {
 	ncMsg := msg.(nc.Message)
 	err := r.receiver.Receive(ncMsg)
 	if err != nil {

@@ -10,7 +10,7 @@ import "sync"
 const minimalMessageSize = 1000
 
 var byteEncoderPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &kafkaByteEncoder{data: make([]byte, 0, minimalMessageSize)}
 	},
 }

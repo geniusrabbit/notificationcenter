@@ -7,17 +7,17 @@ import (
 )
 
 // Encoder function type
-type Encoder func(msg interface{}, wr io.Writer) error
+type Encoder func(msg any, wr io.Writer) error
 
 // JSON encoder implementation
-func JSON(msg interface{}, wr io.Writer) error {
+func JSON(msg any, wr io.Writer) error {
 	enc := json.NewEncoder(wr)
 	enc.SetEscapeHTML(false)
 	return enc.Encode(msg)
 }
 
 // XML encoder implementation
-func XML(msg interface{}, wr io.Writer) error {
+func XML(msg any, wr io.Writer) error {
 	enc := xml.NewEncoder(wr)
 	return enc.Encode(msg)
 }

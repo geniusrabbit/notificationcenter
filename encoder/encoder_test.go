@@ -16,7 +16,7 @@ type testItem struct {
 
 func TestEncoding(t *testing.T) {
 	tests := []struct {
-		obj    interface{}
+		obj    any
 		target string
 		enc    Encoder
 	}{

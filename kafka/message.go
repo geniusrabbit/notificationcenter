@@ -2,24 +2,18 @@ package kafka
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Shopify/sarama"
-	cluster "github.com/bsm/sarama-cluster"
 )
 
-// ErrMessageInvalidConsumer error
-var ErrMessageInvalidConsumer = errors.New(`[message] invalid consumer`)
-
 type message struct {
-	ctx      context.Context
-	msg      *sarama.ConsumerMessage
-	consumer *cluster.Consumer
+	msg     *sarama.ConsumerMessage
+	session sarama.ConsumerGroupSession
 }
 
 // Context of the message
 func (m *message) Context() context.Context {
-	return m.ctx
+	return m.session.Context()
 }
 
 // ID returns unical message ID (depends on transport)
@@ -34,9 +28,6 @@ func (m *message) Body() []byte {
 
 // Acknowledgment of the message processing
 func (m *message) Ack() error {
-	if m.consumer == nil {
-		return ErrMessageInvalidConsumer
-	}
-	m.consumer.MarkOffset(m.msg, "")
+	m.session.MarkMessage(m.msg, "")
 	return nil
 }

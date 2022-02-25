@@ -10,12 +10,12 @@ import (
 var ErrInvalidMessageType = errors.New(`invalid message type`)
 
 type messageValue interface {
-	Value() interface{}
+	Value() any
 }
 
 type message struct {
 	ctx context.Context
-	v   interface{}
+	v   any
 }
 
 // Context of the message
@@ -47,12 +47,12 @@ func (m *message) Ack() error {
 }
 
 // Value returns value of the message
-func (m *message) Value() interface{} {
+func (m *message) Value() any {
 	return m.v
 }
 
 // MessageValue take the target value from the message
-func MessageValue(m interface{}) interface{} {
+func MessageValue(m any) any {
 	switch v := m.(type) {
 	case messageValue:
 		return v.Value()

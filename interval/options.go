@@ -4,7 +4,7 @@ import (
 	nc "github.com/geniusrabbit/notificationcenter"
 )
 
-type handler func() interface{}
+type handler func() any
 
 // Options time interval wrapper
 type Options struct {

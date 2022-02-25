@@ -6,7 +6,7 @@ import (
 	nc "github.com/geniusrabbit/notificationcenter"
 	"github.com/geniusrabbit/notificationcenter/encoder"
 	"github.com/geniusrabbit/notificationcenter/internal/logger"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,7 +44,7 @@ func TestOptionWithURL(t *testing.T) {
 	WithErrorHandler(func(msg nc.Message, err error) {})(&options)
 	assert.NotNil(t, options.ErrorHandler, "invalid error handler")
 
-	WithPanicHandler(func(msg nc.Message, recoverData interface{}) {})(&options)
+	WithPanicHandler(func(msg nc.Message, recoverData any) {})(&options)
 	assert.NotNil(t, options.PanicHandler, "invalid panic handler")
 
 	WithLogger(logger.DefaultLogger)(&options)

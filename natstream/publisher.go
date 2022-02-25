@@ -62,7 +62,7 @@ func MustNewPublisher(options ...Option) *Publisher {
 }
 
 // Publish one or more messages to the pub-service
-func (s *Publisher) Publish(ctx context.Context, messages ...interface{}) (err error) {
+func (s *Publisher) Publish(ctx context.Context, messages ...any) (err error) {
 	buff := bytebuffer.AcquireBuffer()
 	defer func() {
 		bytebuffer.ReleaseBuffer(buff)

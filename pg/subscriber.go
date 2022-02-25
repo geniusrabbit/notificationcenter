@@ -15,9 +15,9 @@ import (
 )
 
 type loggerInterface interface {
-	Info(params ...interface{})
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Info(params ...any)
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Subscriber for kafka
