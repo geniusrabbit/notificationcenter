@@ -36,7 +36,7 @@ func (m *MockPublisher) EXPECT() *MockPublisherMockRecorder {
 // Publish mocks base method
 func (m *MockPublisher) Publish(ctx context.Context, messages ...any) error {
 	m.ctrl.T.Helper()
-	varargs := []any{ctx}
+	varargs := []interface{}{ctx}
 	for _, a := range messages {
 		varargs = append(varargs, a)
 	}
@@ -46,8 +46,8 @@ func (m *MockPublisher) Publish(ctx context.Context, messages ...any) error {
 }
 
 // Publish indicates an expected call of Publish
-func (mr *MockPublisherMockRecorder) Publish(ctx any, messages ...any) *gomock.Call {
+func (mr *MockPublisherMockRecorder) Publish(ctx interface{}, messages ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{ctx}, messages...)
+	varargs := append([]interface{}{ctx}, messages...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockPublisher)(nil).Publish), varargs...)
 }

@@ -57,7 +57,7 @@ func (m *MockSubscriber) Subscribe(ctx context.Context, receiver notificationcen
 }
 
 // Subscribe indicates an expected call of Subscribe
-func (mr *MockSubscriberMockRecorder) Subscribe(ctx, receiver any) *gomock.Call {
+func (mr *MockSubscriberMockRecorder) Subscribe(ctx, receiver interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockSubscriber)(nil).Subscribe), ctx, receiver)
 }
@@ -71,7 +71,7 @@ func (m *MockSubscriber) Listen(ctx context.Context) error {
 }
 
 // Listen indicates an expected call of Listen
-func (mr *MockSubscriberMockRecorder) Listen(ctx any) *gomock.Call {
+func (mr *MockSubscriberMockRecorder) Listen(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Listen", reflect.TypeOf((*MockSubscriber)(nil).Listen), ctx)
 }
