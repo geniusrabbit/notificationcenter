@@ -34,7 +34,7 @@ func (m *MockPublisher) EXPECT() *MockPublisherMockRecorder {
 }
 
 // Publish mocks base method
-func (m *MockPublisher) Publish(ctx context.Context, messages ...interface{}) error {
+func (m *MockPublisher) Publish(ctx context.Context, messages ...any) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx}
 	for _, a := range messages {

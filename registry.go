@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
 )
 
 // Error list...
@@ -61,7 +62,7 @@ func (r *Registry) Subscriber(name string) Subscriber {
 //     "notifications", nats.MustNewSubscriber(),
 //   )
 // ```
-func (r *Registry) Register(params ...interface{}) error {
+func (r *Registry) Register(params ...any) error {
 	var name string
 	r.mx.Lock()
 	defer r.mx.Unlock()
@@ -92,7 +93,7 @@ func (r *Registry) Register(params ...interface{}) error {
 }
 
 // Publish one or more messages to the pub-service
-func (r *Registry) Publish(ctx context.Context, name string, messages ...interface{}) error {
+func (r *Registry) Publish(ctx context.Context, name string, messages ...any) error {
 	pub := r.Publisher(name)
 	if pub == nil {
 		return errors.Wrapf(ErrUndefinedPublisherInterface, name)
@@ -101,9 +102,9 @@ func (r *Registry) Publish(ctx context.Context, name string, messages ...interfa
 }
 
 // Subscribe new handler on some particular subscriber interface by name
-func (r *Registry) Subscribe(ctx context.Context, name string, receiver Receiver) error {
+func (r *Registry) Subscribe(ctx context.Context, name string, receiver any) error {
 	if sub := r.Subscriber(name); sub != nil {
-		return sub.Subscribe(ctx, receiver)
+		return sub.Subscribe(ctx, ReceiverFrom(receiver))
 	}
 	return errors.Wrap(ErrUndefinedSubscriberInterface, name)
 }
@@ -128,30 +129,27 @@ func (r *Registry) Listen(ctx context.Context) (err error) {
 
 // Close notification center
 func (r *Registry) Close() error {
-	var errors []error
+	var errors error
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	for _, pub := range r.publishers {
 		if cl, ok := pub.(io.Closer); ok {
 			if err := cl.Close(); err != nil {
-				errors = append(errors, err)
+				errors = multierr.Append(errors, err)
 			}
 		}
 	}
 	for _, sub := range r.subscribers {
 		if cl, ok := sub.(io.Closer); ok {
 			if err := cl.Close(); err != nil {
-				errors = append(errors, err)
+				errors = multierr.Append(errors, err)
 			}
 		}
 	}
 	for i := int32(0); i < atomic.LoadInt32(&r.closeEventCount); i++ {
 		r.closeEvent <- true
 	}
-	if len(errors) > 0 {
-		return MultiError(errors...)
-	}
-	return nil
+	return errors
 }
 
 // OnClose event will be executed only after closing all interfaces

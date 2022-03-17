@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 // PublisherWrapper provides additional check before send message to the stream
@@ -28,7 +28,7 @@ func MewPublisherWrapper(pub nc.Publisher, checker Checker) *PublisherWrapper {
 }
 
 // Publish one or more messages to the pub-service if will pass conditions
-func (wr *PublisherWrapper) Publish(ctx context.Context, messages ...interface{}) error {
+func (wr *PublisherWrapper) Publish(ctx context.Context, messages ...any) error {
 	for _, msg := range messages {
 		if wr.checker.IsSkip(msg) {
 			continue

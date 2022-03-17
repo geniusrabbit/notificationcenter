@@ -10,13 +10,13 @@ import (
 func TestMultiPublisher(t *testing.T) {
 	sum := 0
 	pubs := MultiPublisher{
-		FuncPublisher(func(ctx context.Context, messages ...interface{}) error {
+		FuncPublisher(func(ctx context.Context, messages ...any) error {
 			for _, v := range messages {
 				sum += v.(int)
 			}
 			return nil
 		}),
-		FuncPublisher(func(ctx context.Context, messages ...interface{}) error {
+		FuncPublisher(func(ctx context.Context, messages ...any) error {
 			for _, v := range messages {
 				sum += v.(int)
 			}

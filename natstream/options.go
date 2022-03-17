@@ -9,14 +9,14 @@ import (
 	nats "github.com/nats-io/nats.go"
 	nstream "github.com/nats-io/stan.go"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/logger"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
 )
 
 type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Options of the NATS wrapper

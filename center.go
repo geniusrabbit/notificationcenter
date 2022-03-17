@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2016 – 2017, 2019 - 2020
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017, 2019 - 2020
+// @project geniusrabbit.com 2016 – 2017, 2019 - 2022
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2016 – 2017, 2019 - 2022
 //
 
 package notificationcenter
@@ -32,17 +32,17 @@ func SubscriberByName(name string) Subscriber {
 //     "notifications", nats.MustNewSubscriber(),
 //   )
 // ```
-func Register(params ...interface{}) error {
+func Register(params ...any) error {
 	return DefaultRegistry.Register(params...)
 }
 
 // Publish one or more messages to the pub-service
-func Publish(ctx context.Context, name string, messages ...interface{}) error {
+func Publish(ctx context.Context, name string, messages ...any) error {
 	return DefaultRegistry.Publish(ctx, name, messages...)
 }
 
 // Subscribe new handler on some particular subscriber interface by name
-func Subscribe(ctx context.Context, name string, receiver Receiver) error {
+func Subscribe(ctx context.Context, name string, receiver any) error {
 	return DefaultRegistry.Subscribe(ctx, name, receiver)
 }
 

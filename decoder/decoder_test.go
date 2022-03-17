@@ -15,7 +15,7 @@ type testItem struct {
 
 func TestDecoding(t *testing.T) {
 	tests := []struct {
-		target interface{}
+		target any
 		data   string
 		dec    Decoder
 	}{

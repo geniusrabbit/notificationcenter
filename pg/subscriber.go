@@ -11,13 +11,13 @@ import (
 
 	"github.com/lib/pq"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {
-	Info(params ...interface{})
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Info(params ...any)
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Subscriber for kafka

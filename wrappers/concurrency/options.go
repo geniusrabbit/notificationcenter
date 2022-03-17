@@ -1,6 +1,6 @@
 package concurrency
 
-import "github.com/demdxx/rpool"
+import "github.com/demdxx/rpool/v2"
 
 // Option func type which adjust option values
 type Option func() rpool.Option
@@ -13,7 +13,7 @@ func WithWorkerPoolSize(size int) Option {
 }
 
 // WithRecoverHandler defined error handler
-func WithRecoverHandler(f func(interface{})) Option {
+func WithRecoverHandler(f func(any)) Option {
 	return func() rpool.Option {
 		return rpool.WithRecoverHandler(f)
 	}

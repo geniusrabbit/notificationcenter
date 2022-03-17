@@ -4,4 +4,4 @@ package notificationcenter
 type ErrorHandler func(msg Message, err error)
 
 // PanicHandler type to process panic action
-type PanicHandler func(msg Message, recoverData interface{})
+type PanicHandler func(msg Message, recoverData any)

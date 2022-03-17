@@ -3,11 +3,12 @@ package redis
 import (
 	"context"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/multierr"
+
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/bytebuffer"
 )
 
 // Publisher for NATS queue
@@ -53,7 +54,7 @@ func MustNewPublisher(options ...Option) *Publisher {
 }
 
 // Publish one or more messages to the pub-service
-func (s *Publisher) Publish(ctx context.Context, messages ...interface{}) (err error) {
+func (s *Publisher) Publish(ctx context.Context, messages ...any) (err error) {
 	buff := bytebuffer.AcquireBuffer()
 	defer func() {
 		bytebuffer.ReleaseBuffer(buff)
@@ -68,7 +69,7 @@ func (s *Publisher) Publish(ctx context.Context, messages ...interface{}) (err e
 		buff.Reset()
 		if err = s.encoder(msg, buff); err == nil {
 			for _, channel := range s.channels {
-				if pubErr := s.cli.Publish(channel, buff.Bytes()).Err(); pubErr != nil {
+				if pubErr := s.cli.Publish(ctx, channel, buff.Bytes()).Err(); pubErr != nil {
 					err = multierr.Append(err, pubErr)
 				}
 			}

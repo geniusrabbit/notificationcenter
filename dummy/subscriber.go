@@ -3,7 +3,7 @@ package dummy
 import (
 	"context"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 // Subscriber struct

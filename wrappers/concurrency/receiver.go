@@ -1,8 +1,8 @@
 package concurrency
 
 import (
-	"github.com/demdxx/rpool"
-	nc "github.com/geniusrabbit/notificationcenter"
+	"github.com/demdxx/rpool/v2"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type errHandlerFnk func(err error, msg nc.Message)
@@ -10,7 +10,7 @@ type errHandlerFnk func(err error, msg nc.Message)
 type receiver struct {
 	receiver   nc.Receiver
 	errHandler errHandlerFnk
-	execPool   *rpool.PoolFunc
+	execPool   *rpool.PoolFunc[nc.Message]
 }
 
 // WithWorkers wraps receiver in concurrent pool
@@ -32,12 +32,11 @@ func (r *receiver) Receive(msg nc.Message) error {
 	return nil
 }
 
-func (r *receiver) executor(msg interface{}) {
-	ncMsg := msg.(nc.Message)
-	err := r.receiver.Receive(ncMsg)
+func (r *receiver) executor(msg nc.Message) {
+	err := r.receiver.Receive(msg)
 	if err != nil {
 		if r.errHandler != nil {
-			r.errHandler(err, ncMsg)
+			r.errHandler(err, msg)
 		} else {
 			panic(err)
 		}

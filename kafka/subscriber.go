@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2015, 2019 - 2020
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2020
+// @project geniusrabbit.com 2015, 2019 - 2022
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015, 2019 - 2022
 //
 
 package kafka
@@ -9,27 +9,23 @@ import (
 	"context"
 	"time"
 
-	cluster "github.com/bsm/sarama-cluster"
-	"github.com/geniusrabbit/notificationcenter"
+	"github.com/Shopify/sarama"
+	"github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
-
-// SubscriberNotificationHandler callback function
-type SubscriberNotificationHandler func(notification *cluster.Notification)
 
 // Subscriber for kafka
 type Subscriber struct {
 	notificationcenter.ModelSubscriber
 
-	// consumer object which receive the messages
-	consumer *cluster.Consumer
+	topics []string
 
-	// notificationHandler callback
-	notificationHandler SubscriberNotificationHandler
+	// consumer object which receive the messages
+	consumerGroup sarama.ConsumerGroup
 
 	// logger interface
 	logger loggerInterface
@@ -38,12 +34,12 @@ type Subscriber struct {
 // NewSubscriber connection to kafka "group" from list of topics
 func NewSubscriber(options ...Option) (*Subscriber, error) {
 	var opts Options
-	opts.ClusterConfig = *cluster.NewConfig()
+	opts.ClusterConfig = *sarama.NewConfig()
 	opts.ClusterConfig.Consumer.Offsets.CommitInterval = time.Second
 	for _, opt := range options {
 		opt(&opts)
 	}
-	consumer, err := cluster.NewConsumer(opts.Brokers, opts.group(), opts.Topics, opts.clusterConfig())
+	consumerGroup, err := sarama.NewConsumerGroup(opts.Brokers, opts.group(), opts.clusterConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +48,9 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 			ErrorHandler: opts.ErrorHandler,
 			PanicHandler: opts.PanicHandler,
 		},
-		consumer: consumer,
-		logger:   opts.logger(),
+		topics:        opts.Topics,
+		consumerGroup: consumerGroup,
+		logger:        opts.logger(),
 	}, nil
 }
 
@@ -62,43 +59,49 @@ func NewSubscriber(options ...Option) (*Subscriber, error) {
 ///////////////////////////////////////////////////////////////////////////////
 
 // Listen kafka consumer
-func (s *Subscriber) Listen(ctx context.Context) (err error) {
-loop:
+func (s *Subscriber) Listen(ctx context.Context) error {
 	for {
-		if s.consumer == nil {
-			break
+		if err := s.consumerGroup.Consume(ctx, s.topics, s); err != nil {
+			s.processError(err)
 		}
-		select {
-		case msg, ok := <-s.consumer.Messages():
-			if !ok {
-				break loop
-			}
-			m := &message{ctx: ctx, msg: msg, consumer: s.consumer}
-			if err := s.ProcessMessage(m); err != nil {
-				s.logger.Error(err)
-			}
-		case err, ok := <-s.consumer.Errors():
-			if !ok {
-				break loop
-			}
-			if err != nil {
-				s.processError(err)
-			}
-		case notification, ok := <-s.consumer.Notifications():
-			if !ok {
-				break loop
-			}
-			s.processNotification(notification)
-		case <-ctx.Done():
-			break loop
+		// check if context was cancelled, signaling that the consumer should stop
+		if ctx.Err() != nil {
+			return nil
 		}
 	}
-	return err
+}
+
+// Setup is run at the beginning of a new session, before ConsumeClaim.
+func (s *Subscriber) Setup(sarama.ConsumerGroupSession) error {
+	return nil
+}
+
+// Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
+// but before the offsets are committed for the very last time.
+func (s *Subscriber) Cleanup(sarama.ConsumerGroupSession) error {
+	return nil
+}
+
+// ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
+// Once the Messages() channel is closed, the Handler must finish its processing
+// loop and exit.
+func (s *Subscriber) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	// NOTE:
+	// Do not move the code below to a goroutine.
+	// The `ConsumeClaim` itself is called within a goroutine, see:
+	// https://github.com/Shopify/sarama/blob/main/consumer_group.go#L27-L29
+	for msg := range claim.Messages() {
+		m := &message{msg: msg, session: session}
+		if err := s.ProcessMessage(m); err != nil {
+			s.logger.Error(err)
+		}
+	}
+	return nil
 }
 
 // Close kafka consumer
 func (s *Subscriber) Close() error {
-	if err := s.consumer.Close(); err != nil {
+	if err := s.consumerGroup.Close(); err != nil {
 		_ = s.ModelSubscriber.Close()
 		return err
 	}
@@ -110,13 +113,5 @@ func (s *Subscriber) processError(err error) {
 		s.ModelSubscriber.ErrorHandler(nil, err)
 	} else {
 		s.logger.Error(err)
-	}
-}
-
-func (s *Subscriber) processNotification(notification *cluster.Notification) {
-	if s.notificationHandler != nil {
-		s.notificationHandler(notification)
-	} else {
-		s.logger.Debugf("consumer notification: %+v", notification)
 	}
 }

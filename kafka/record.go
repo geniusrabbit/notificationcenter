@@ -1,6 +1,6 @@
 //
-// @project geniusrabbit.com 2015 – 2016, 2019
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019
+// @project geniusrabbit.com 2015 – 2016, 2019 – 2022
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019 – 2022
 //
 
 package kafka
@@ -10,7 +10,7 @@ import "sync"
 const minimalMessageSize = 1000
 
 var byteEncoderPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &kafkaByteEncoder{data: make([]byte, 0, minimalMessageSize)}
 	},
 }

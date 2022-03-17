@@ -1,10 +1,10 @@
 package interval
 
 import (
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
-type handler func() interface{}
+type handler func() any
 
 // Options time interval wrapper
 type Options struct {

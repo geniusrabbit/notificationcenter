@@ -13,17 +13,17 @@ func nlog() *LoggerStd {
 }
 
 // Info level printing
-func (l *LoggerStd) Info(params ...interface{}) {
+func (l *LoggerStd) Info(params ...any) {
 	l.lg().Println(params...)
 }
 
 // Error level printing
-func (l *LoggerStd) Error(params ...interface{}) {
+func (l *LoggerStd) Error(params ...any) {
 	l.lg().Println(params...)
 }
 
 // Debugf level printing
-func (l *LoggerStd) Debugf(msg string, params ...interface{}) {
+func (l *LoggerStd) Debugf(msg string, params ...any) {
 	l.lg().Printf(msg, params...)
 }
 

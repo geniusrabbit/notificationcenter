@@ -7,14 +7,14 @@ import (
 )
 
 type targetInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 func TestDefaultLogger(t *testing.T) {
 	var (
-		def   interface{} = DefaultLogger
-		lg, _             = def.(targetInterface)
+		def   any = DefaultLogger
+		lg, _     = def.(targetInterface)
 	)
 	assert.NotNil(t, lg)
 }

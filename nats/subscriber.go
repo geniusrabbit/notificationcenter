@@ -10,12 +10,12 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
-	"github.com/geniusrabbit/notificationcenter"
+	"github.com/geniusrabbit/notificationcenter/v2"
 )
 
 type loggerInterface interface {
-	Error(params ...interface{})
-	Debugf(msg string, params ...interface{})
+	Error(params ...any)
+	Debugf(msg string, params ...any)
 }
 
 // Subscriber for NATS queue

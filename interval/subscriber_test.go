@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,7 @@ func TestInterval(t *testing.T) {
 	)
 	defer cancel()
 
-	sub := NewSubscriber(time.Millisecond, WithHandler(func() interface{} { return "test" }))
+	sub := NewSubscriber(time.Millisecond, WithHandler(func() any { return "test" }))
 	err := sub.Subscribe(ctx, nc.FuncReceiver(func(msg nc.Message) error {
 		switch v := MessageValue(msg).(type) {
 		case string:
@@ -44,8 +44,8 @@ func TestIntervalPanic(t *testing.T) {
 	defer cancel()
 
 	sub := NewSubscriber(time.Millisecond,
-		WithHandler(func() interface{} { return "test" }),
-		WithPanicHandler(func(msg nc.Message, recoverData interface{}) {
+		WithHandler(func() any { return "test" }),
+		WithPanicHandler(func(msg nc.Message, recoverData any) {
 			assert.Equal(t, "test", recoverData)
 		}),
 	)
@@ -65,7 +65,7 @@ func TestIntervalError(t *testing.T) {
 	defer cancel()
 
 	sub := NewSubscriber(time.Millisecond,
-		WithHandler(func() interface{} { return "test" }),
+		WithHandler(func() any { return "test" }),
 		WithErrorHandler(func(msg nc.Message, err error) {
 			assert.Equal(t, testError, err)
 		}),

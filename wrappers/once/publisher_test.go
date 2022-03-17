@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/geniusrabbit/notificationcenter/dummy"
-	"github.com/geniusrabbit/notificationcenter/wrappers/once/bigcache"
+	"github.com/geniusrabbit/notificationcenter/v2/dummy"
+	"github.com/geniusrabbit/notificationcenter/v2/wrappers/once/bigcache"
 )
 
 func TestPublisher(t *testing.T) {

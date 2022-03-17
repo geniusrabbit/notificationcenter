@@ -10,9 +10,9 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
-	nc "github.com/geniusrabbit/notificationcenter"
-	"github.com/geniusrabbit/notificationcenter/encoder"
-	"github.com/geniusrabbit/notificationcenter/internal/bytebuffer"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
+	"github.com/geniusrabbit/notificationcenter/v2/encoder"
+	"github.com/geniusrabbit/notificationcenter/v2/internal/bytebuffer"
 )
 
 // Publisher provides functionality to work with NATS queue
@@ -62,7 +62,7 @@ func MustNewPublisher(options ...Option) *Publisher {
 }
 
 // Publish one or more messages to the pub-service
-func (s *Publisher) Publish(ctx context.Context, messages ...interface{}) (err error) {
+func (s *Publisher) Publish(ctx context.Context, messages ...any) (err error) {
 	buff := bytebuffer.AcquireBuffer()
 	defer func() {
 		bytebuffer.ReleaseBuffer(buff)

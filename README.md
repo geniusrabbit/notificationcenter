@@ -37,7 +37,7 @@ Basic examples of usage.
 
 ```go
 import(
-  nc "github.com/geniusrabbit/notificationcenter"
+  nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 ```
 
@@ -72,8 +72,8 @@ events.Publish(context.Background(), message{title: "event 2"})
 
 ```go
 import (
-  nc "github.com/geniusrabbit/notificationcenter"
-  "github.com/geniusrabbit/notificationcenter/nats"
+  nc "github.com/geniusrabbit/notificationcenter/v2"
+  "github.com/geniusrabbit/notificationcenter/v2/nats"
 )
 
 func main() {
@@ -84,15 +84,15 @@ func main() {
   nc.Register("refresh", interval.NewSubscriber(time.Minute * 5))
 
   // Add new receiver to process the stream "events"
-  nc.Subscribe("events", nc.FuncReceiver(ctx, func(msg nc.Message) error {
+  nc.Subscribe("events", func(msg nc.Message) error {
     fmt.Printf("%v\n", msg.Data())
-    return nil
-  }))
+    return msg.Ack()
+  })
 
   // Add new time interval receiver to refresh the data every 5 minutes
-  nc.Subscribe("refresh", nc.FuncReceiver(ctx, func(msg nc.Message) error {
+  nc.Subscribe("refresh", func(msg nc.Message) error {
     return db.Reload()
-  }))
+  })
 
   // Run subscriber listeners
   nc.Listen(ctx)

@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 type message struct {

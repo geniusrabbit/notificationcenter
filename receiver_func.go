@@ -4,19 +4,24 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/geniusrabbit/notificationcenter/decoder"
 	"github.com/pkg/errors"
+
+	"github.com/geniusrabbit/notificationcenter/v2/decoder"
 )
 
 var errInvalidReturnType = errors.New("invalid return types")
 
 // ReceiverFrom converts income handler type to Receiver interface
-func ReceiverFrom(handler interface{}) Receiver {
+func ReceiverFrom(handler any) Receiver {
 	switch h := handler.(type) {
 	case Receiver:
 		return h
+	case func() error:
+		return FuncReceiver(func(msg Message) error { h(); return msg.Ack() })
 	case func(msg Message) error:
 		return FuncReceiver(h)
+	case func(ctx context.Context, msg Message) error:
+		return FuncReceiver(func(msg Message) error { return h(msg.Context(), msg) })
 	default:
 		return ExtFuncReceiver(h)
 	}
@@ -29,7 +34,7 @@ var (
 )
 
 // ExtFuncReceiver wraps function argument with arbitrary input data type
-func ExtFuncReceiver(f interface{}, decs ...decoder.Decoder) Receiver {
+func ExtFuncReceiver(f any, decs ...decoder.Decoder) Receiver {
 	fv := reflect.ValueOf(f)
 	if fv.Kind() != reflect.Func {
 		panic("argument must be a function")
@@ -95,7 +100,7 @@ func ExtFuncReceiver(f interface{}, decs ...decoder.Decoder) Receiver {
 	})
 }
 
-func newValue(t reflect.Type) (reflect.Value, interface{}) {
+func newValue(t reflect.Type) (reflect.Value, any) {
 	if t.Kind() == reflect.Ptr {
 		return newValue(t.Elem())
 	}

@@ -6,16 +6,16 @@ import (
 	"encoding/json"
 	"io"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 
-func jsonEncoder(msg interface{}, wr io.Writer) error {
+func jsonEncoder(msg any, wr io.Writer) error {
 	enc := json.NewEncoder(wr)
 	enc.SetEscapeHTML(false)
 	return enc.Encode(msg)
 }
 
-type encoder func(msg interface{}, wr io.Writer) error
+type encoder func(msg any, wr io.Writer) error
 
 // Publisher writer for GO proxy server
 type Publisher struct {
@@ -23,7 +23,7 @@ type Publisher struct {
 }
 
 // Publish one or more messages to the pub-service
-func (p Publisher) Publish(ctx context.Context, messages ...interface{}) error {
+func (p Publisher) Publish(ctx context.Context, messages ...any) error {
 	for _, msg := range messages {
 		if err := p.proxy.write(ctx, msg); err != nil {
 			return err
@@ -55,7 +55,7 @@ func (p *Proxy) Publisher() Publisher {
 	return Publisher{proxy: p}
 }
 
-func (p *Proxy) write(ctx context.Context, msg interface{}) error {
+func (p *Proxy) write(ctx context.Context, msg any) error {
 	buff := &bytes.Buffer{}
 	if err := p.encoder(msg, buff); err != nil {
 		return err

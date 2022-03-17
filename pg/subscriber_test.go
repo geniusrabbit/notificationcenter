@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	nc "github.com/geniusrabbit/notificationcenter"
+	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -9,7 +9,7 @@ import (
 
 type testPublisher struct{}
 
-func (p *testPublisher) Publish(ctx context.Context, messages ...interface{}) error { return nil }
+func (p *testPublisher) Publish(ctx context.Context, messages ...any) error { return nil }
 
 type testSubscriber struct{}
 
