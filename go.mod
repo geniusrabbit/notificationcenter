@@ -11,8 +11,8 @@ require (
 	github.com/elliotchance/redismock/v8 v8.11.0
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/golang/mock v1.6.0
-	github.com/lib/pq v1.10.2
-	github.com/nats-io/nats.go v1.13.0
+	github.com/lib/pq v1.10.4
+	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d
 	github.com/nats-io/stan.go v0.10.2
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
@@ -36,8 +36,8 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/klauspost/compress v1.14.4 // indirect
-	github.com/nats-io/nats-server/v2 v2.2.6 // indirect
-	github.com/nats-io/nats-streaming-server v0.22.0 // indirect
+	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
+	github.com/nats-io/nats-streaming-server v0.24.1 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
@@ -48,7 +48,7 @@ require (
 	github.com/stretchr/objx v0.1.0 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20210529063254-f4c35e4016d9 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

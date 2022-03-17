@@ -19,9 +19,11 @@ export GOPATH=$(abspath $(TMP))
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
+export GOSUMDB := off
 # Go 1.13 defaults to TLS 1.3 and requires an opt-out.  Opting out for now until certs can be regenerated before 1.14
 # https://golang.org/doc/go1.12#tls_1_3
 export GODEBUG := tls13=0
+export GOPRIVATE=sum.golang.org/*
 
 GOLANGLINTCI_VERSION := latest
 GOLANGLINTCI := $(TMP_VERSIONS)/golangci-lint/$(GOLANGLINTCI_VERSION)
