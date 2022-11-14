@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/demdxx/gocast"
+	"github.com/demdxx/gocast/v2"
 	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/geniusrabbit/notificationcenter/v2/encoder"
 	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
@@ -82,7 +82,7 @@ func WithRedisURL(urlString string) Option {
 		}
 		dbNum := 0
 		if len(u.Path) > 1 {
-			dbNum = gocast.ToInt(u.Path[1:])
+			dbNum = gocast.Number[int](u.Path[1:])
 		}
 		query := u.Query()
 		channels := strings.Split(query.Get(`topics`), `,`)
@@ -98,9 +98,9 @@ func WithRedisURL(urlString string) Option {
 			Addr:         u.Host,
 			Password:     password,
 			DB:           dbNum,
-			MaxRetries:   gocast.ToInt(query.Get("max_retries")),
-			PoolSize:     gocast.ToInt(query.Get("pool_size")),
-			MinIdleConns: gocast.ToInt(query.Get("min_idle_conns")),
+			MaxRetries:   gocast.Number[int](query.Get("max_retries")),
+			PoolSize:     gocast.Number[int](query.Get("pool_size")),
+			MinIdleConns: gocast.Number[int](query.Get("min_idle_conns")),
 		}
 	}
 }
