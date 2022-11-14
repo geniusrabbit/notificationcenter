@@ -17,7 +17,12 @@ func ReceiverFrom(handler any) Receiver {
 	case Receiver:
 		return h
 	case func() error:
-		return FuncReceiver(func(msg Message) error { h(); return msg.Ack() })
+		return FuncReceiver(func(msg Message) error {
+			if err := h(); err != nil {
+				return err
+			}
+			return msg.Ack()
+		})
 	case func(msg Message) error:
 		return FuncReceiver(h)
 	case func(ctx context.Context, msg Message) error:
