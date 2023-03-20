@@ -1,6 +1,6 @@
 # Notificationcenter pub/sub library
 
-[![Build Status](https://github.com/geniusrabbit/notificationcenter/workflows/run%20tests/badge.svg)](https://github.com/geniusrabbit/notificationcenter/actions?workflow=run%20tests)
+[![Build Status](https://github.com/geniusrabbit/notificationcenter/workflows/Tests/badge.svg)](https://github.com/geniusrabbit/notificationcenter/actions?workflow=Tests)
 [![Go Report Card](https://goreportcard.com/badge/github.com/geniusrabbit/notificationcenter)](https://goreportcard.com/report/github.com/geniusrabbit/notificationcenter)
 [![GoDoc](https://godoc.org/github.com/geniusrabbit/notificationcenter?status.svg)](https://godoc.org/github.com/geniusrabbit/notificationcenter)
 [![Coverage Status](https://coveralls.io/repos/github/geniusrabbit/notificationcenter/badge.svg)](https://coveralls.io/github/geniusrabbit/notificationcenter)
