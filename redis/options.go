@@ -1,14 +1,17 @@
 package redis
 
 import (
+	"crypto/tls"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/demdxx/gocast/v2"
+	"github.com/redis/go-redis/v9"
+
 	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/geniusrabbit/notificationcenter/v2/encoder"
 	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
-	"github.com/go-redis/redis/v8"
 )
 
 type loggerInterface interface {
@@ -93,14 +96,45 @@ func WithRedisURL(urlString string) Option {
 			opt.Channels = channels
 		}
 		password, _ := u.User.Password()
+		network := "tcp"
+		if u.Scheme == "unix" {
+			network = "unix"
+		}
 		opt.RedisOptions = &redis.Options{
-			Network:      "tcp",
-			Addr:         u.Host,
-			Password:     password,
-			DB:           dbNum,
-			MaxRetries:   gocast.Number[int](query.Get("max_retries")),
-			PoolSize:     gocast.Number[int](query.Get("pool_size")),
-			MinIdleConns: gocast.Number[int](query.Get("min_idle_conns")),
+			Network:         network,
+			Addr:            u.Host,
+			Password:        password,
+			DB:              dbNum,
+			ClientName:      query.Get("client_name"),
+			MaxRetries:      gocast.Number[int](query.Get("max_retries")),
+			MinRetryBackoff: parseDuration(query.Get("min_retry_backoff")),
+			MaxRetryBackoff: parseDuration(query.Get("max_retry_backoff")),
+			DialTimeout:     parseDuration(query.Get("dial_timeout")),
+			ReadTimeout:     parseDuration(query.Get("read_timeout")),
+			WriteTimeout:    parseDuration(query.Get("write_timeout")),
+			PoolFIFO:        gocast.Bool(query.Get("pool_fifo")),
+			PoolSize:        gocast.Number[int](query.Get("pool_size")),
+			PoolTimeout:     parseDuration(query.Get("pool_timeout")),
+			MinIdleConns:    gocast.Number[int](query.Get("min_idle_conns")),
+			MaxIdleConns:    gocast.Number[int](query.Get("max_idle_conns")),
+		}
+
+		if query.Has("conn_max_idle_time") {
+			opt.RedisOptions.ConnMaxIdleTime = parseDuration(query.Get("conn_max_idle_time"))
+		} else {
+			opt.RedisOptions.ConnMaxIdleTime = parseDuration(query.Get("idle_timeout"))
+		}
+		if query.Has("conn_max_lifetime") {
+			opt.RedisOptions.ConnMaxLifetime = parseDuration(query.Get("conn_max_lifetime"))
+		} else {
+			opt.RedisOptions.ConnMaxLifetime = parseDuration(query.Get("max_conn_age"))
+		}
+
+		if u.Scheme == "rediss" {
+			opt.RedisOptions.TLSConfig = &tls.Config{
+				ServerName: u.Hostname(),
+				MinVersion: tls.VersionTLS12,
+			}
 		}
 	}
 }
@@ -152,4 +186,9 @@ func WithLogger(logger loggerInterface) Option {
 	return func(opt *Options) {
 		opt.Logger = logger
 	}
+}
+
+func parseDuration(s string) time.Duration {
+	d, _ := time.ParseDuration(s)
+	return d
 }

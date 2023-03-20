@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSubSub(t *testing.T) {
+func TestPubSub(t *testing.T) {
 	type tmsg struct{ S string }
 	var (
 		rw      sync.RWMutex
@@ -20,7 +20,7 @@ func TestSubSub(t *testing.T) {
 		mr, err = miniredis.Run()
 	)
 	assert.NoError(t, err)
-	defer mr.Close()
+	defer func() { mr.Close() }()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()

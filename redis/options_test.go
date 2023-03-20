@@ -6,7 +6,7 @@ import (
 	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/geniusrabbit/notificationcenter/v2/encoder"
 	"github.com/geniusrabbit/notificationcenter/v2/internal/logger"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/multierr"
 
 	nc "github.com/geniusrabbit/notificationcenter/v2"

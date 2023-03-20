@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 
 	nc "github.com/geniusrabbit/notificationcenter/v2"
 )
@@ -82,9 +82,9 @@ func (s *Subscriber) message(ctx context.Context, m *redis.Message) {
 
 // Close nstream client
 func (s *Subscriber) Close() error {
-	err := s.cli.Close()
+	err := s.sub.Close()
 	if err == nil {
-		err = s.sub.Close()
+		err = s.cli.Close()
 	}
 	s.closeEvent <- true
 	return err

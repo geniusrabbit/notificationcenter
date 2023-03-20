@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/geniusrabbit/notificationcenter/v2/internal/objecthash"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 // Checker provides inmemory messages test
@@ -19,9 +19,14 @@ func New(client redis.Cmdable, lifetime time.Duration) *Checker {
 	return &Checker{client: client, lifetime: lifetime}
 }
 
-// NewByHost checker
-func NewByHost(host string, lifetime time.Duration) *Checker {
-	return New(redis.NewClient(&redis.Options{Addr: host}), lifetime)
+// NewByURL returns checker by redis URL
+// redis://[:password]@host:port/db?max_idle=3&max_active=5&idle_timeout=240s
+func NewByURL(url string, lifetime time.Duration) (*Checker, error) {
+	opt, err := redis.ParseURL(url)
+	if err != nil {
+		return nil, err
+	}
+	return New(redis.NewClient(opt), lifetime), nil
 }
 
 // IsSkip message if was sent
