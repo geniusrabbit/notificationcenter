@@ -7,17 +7,13 @@
 
 > License Apache 2.0
 
-Publish/subscribe messaging, or pub/sub messaging, is a form of asynchronous
-service-to-service communication used in serverless and microservices architectures.
-In a pub/sub model, any message published to a topic is immediately received by all
-of the subscribers to the topic. Pub/sub messaging can be used to enable event-driven
-architectures, or to decouple applications in order to increase performance,
-reliability and scalability.
+Publish/subscribe messaging, often referred to as pub/sub messaging, serves as a pivotal form of asynchronous communication between services within serverless and microservices architectures. Operating on a pub/sub model, this approach entails the instantaneous transmission of any published message to all subscribers associated with the corresponding topic. The utility of pub/sub messaging extends to enabling event-driven architectures and the seamless decoupling of applications, ultimately yielding improvements in performance, reliability, and scalability.
 
-Library provides basic primitives to use different queue implementations behind,
-simplify writing pub/sub-services.
+At its core, this mechanism involves the interaction between publishers, who disseminate messages, and subscribers, who receive and act upon these messages. By employing this model, systems can leverage the power of loosely coupled communication, enhancing the adaptability of individual components within the broader infrastructure.
 
-- [Using examples](#Using-examples)
+To streamline the implementation of this messaging paradigm, libraries provide essential foundational elements that facilitate the utilization of various queue implementations. These libraries abstract the complexities of interacting with diverse queuing systems, thereby simplifying the development of pub/sub services. This not only promotes efficient communication between services but also empowers developers to concentrate on the business logic and functionality of their applications without becoming entangled in the intricacies of messaging infrastructures.
+
+- [Using examples](#using-examples)
   - [Create new publisher processor](#create-new-publisher-processor)
   - [Send event by the notification publisher](#send-event-by-the-notification-publisher)
   - [Subscribe by the specific notification publisher](#subscribe-by-the-specific-notification-publisher)
@@ -101,13 +97,13 @@ func main() {
 
 ## TODO
 
-* [ ] Add support Amazon SQS queue
-* [X] Add support Redis queue
-* [ ] Add support RabbitMQ queue
-* [ ] Add support MySQL notifications queue
-* [X] Add support PostgreSQL notifications queue
-* [X] Remove metrics from the queue (DEPRECATED)
-* [X] Add support NATS & NATS stream
-* [X] Add support kafka queue
-* [X] Add support native GO chanels
-* [X] Add support native GO time interval
+- [ ] Add support Amazon SQS queue
+- [X] Add support Redis queue
+- [ ] Add support RabbitMQ queue
+- [ ] Add support MySQL notifications queue
+- [X] Add support PostgreSQL notifications queue
+- [X] ~~Remove metrics from the queue (DEPRECATED)~~
+- [X] Add support NATS & NATS stream
+- [X] Add support kafka queue
+- [X] Add support native GO chanels
+- [X] Add support native GO time interval

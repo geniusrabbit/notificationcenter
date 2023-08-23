@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 
 	nc "github.com/geniusrabbit/notificationcenter/v2"
 	"github.com/geniusrabbit/notificationcenter/v2/encoder"

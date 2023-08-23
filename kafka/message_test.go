@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/geniusrabbit/notificationcenter/v2/encoder"

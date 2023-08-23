@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/geniusrabbit/notificationcenter/v2"
 )
 
@@ -89,7 +89,7 @@ func (s *Subscriber) ConsumeClaim(session sarama.ConsumerGroupSession, claim sar
 	// NOTE:
 	// Do not move the code below to a goroutine.
 	// The `ConsumeClaim` itself is called within a goroutine, see:
-	// https://github.com/Shopify/sarama/blob/main/consumer_group.go#L27-L29
+	// https://github.com/IBM/sarama/blob/main/consumer_group.go#L27-L29
 	for msg := range claim.Messages() {
 		m := &message{msg: msg, session: session}
 		if err := s.ProcessMessage(m); err != nil {
