@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	crand "crypto/rand"
 	"math/rand"
 	"testing"
 	"time"
@@ -96,7 +97,7 @@ func TestNewPublisherPanic(t *testing.T) {
 func strFromDict(strSize int) string {
 	const dict = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*_+-=~"
 	var bytes = make([]byte, strSize)
-	_, _ = rand.Read(bytes)
+	_, _ = crand.Read(bytes)
 	for k, v := range bytes {
 		bytes[k] = dict[v%byte(len(dict))]
 	}

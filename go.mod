@@ -1,6 +1,6 @@
 module github.com/geniusrabbit/notificationcenter/v2
 
-go 1.19
+go 1.20
 
 require (
 	github.com/IBM/sarama v1.43.1
