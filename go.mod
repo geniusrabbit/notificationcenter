@@ -1,19 +1,19 @@
 module github.com/geniusrabbit/notificationcenter/v2
 
-go 1.20
+go 1.22
 
 require (
-	github.com/IBM/sarama v1.43.1
-	github.com/alicebob/miniredis/v2 v2.32.1
+	github.com/IBM/sarama v1.43.2
+	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/allegro/bigcache v1.2.1
-	github.com/demdxx/gocast/v2 v2.8.3
+	github.com/demdxx/gocast/v2 v2.9.0
 	github.com/demdxx/rpool/v2 v2.0.1
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.9
-	github.com/nats-io/nats.go v1.34.1
+	github.com/nats-io/nats.go v1.36.0
 	github.com/nats-io/stan.go v0.10.4
 	github.com/pkg/errors v0.9.1
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/multierr v1.11.0
 )
@@ -36,9 +36,9 @@ require (
 	github.com/jcmturner/gofork v1.7.6 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/nats-io/nats-server/v2 v2.10.14 // indirect
+	github.com/nats-io/nats-server/v2 v2.10.16 // indirect
 	github.com/nats-io/nats-streaming-server v0.25.6 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
@@ -47,9 +47,9 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/net v0.26.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -6,12 +6,16 @@ import (
 )
 
 // Publisher dummy implementation
-type Publisher struct{}
+type Publisher struct {
+	Print bool
+}
 
 // Publish messages for dummy space
 func (pub Publisher) Publish(ctx context.Context, messages ...any) error {
-	for _, msg := range messages {
-		log.Println("publish", msg)
+	if pub.Print {
+		for _, msg := range messages {
+			log.Println("dummy:publish", msg)
+		}
 	}
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 func TestPublisherSubscriber(t *testing.T) {
 	var sub Subscriber
-	var pub Publisher
+	var pub = Publisher{Print: true}
 	var rec = nc.FuncReceiver(func(m nc.Message) error {
 		return nil
 	})
