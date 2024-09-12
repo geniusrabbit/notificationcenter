@@ -67,8 +67,13 @@ func (p *Proxy) write(ctx context.Context, msg any) error {
 // Listen starts processing queue
 func (p *Proxy) Listen(ctx context.Context) error {
 	for msg := range p.pool {
-		if err := p.ProcessMessage(msg); err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			if err := p.ProcessMessage(msg); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
