@@ -1,109 +1,189 @@
-# Notificationcenter pub/sub library
+# Notificationcenter Pub/Sub Library
 
 [![Build Status](https://github.com/geniusrabbit/notificationcenter/workflows/Tests/badge.svg)](https://github.com/geniusrabbit/notificationcenter/actions?workflow=Tests)
 [![Go Report Card](https://goreportcard.com/badge/github.com/geniusrabbit/notificationcenter)](https://goreportcard.com/report/github.com/geniusrabbit/notificationcenter)
 [![GoDoc](https://godoc.org/github.com/geniusrabbit/notificationcenter?status.svg)](https://godoc.org/github.com/geniusrabbit/notificationcenter)
 [![Coverage Status](https://coveralls.io/repos/github/geniusrabbit/notificationcenter/badge.svg)](https://coveralls.io/github/geniusrabbit/notificationcenter)
 
-> License Apache 2.0
+> License: Apache 2.0
 
-Publish/subscribe messaging, often referred to as pub/sub messaging, serves as a pivotal form of asynchronous communication between services within serverless and microservices architectures. Operating on a pub/sub model, this approach entails the instantaneous transmission of any published message to all subscribers associated with the corresponding topic. The utility of pub/sub messaging extends to enabling event-driven architectures and the seamless decoupling of applications, ultimately yielding improvements in performance, reliability, and scalability.
+The **NotificationCenter** library provides a unified interface for publish/subscribe (pub/sub) messaging in Go applications. It simplifies asynchronous communication between services in serverless and microservices architectures by abstracting the complexities of various message brokers.
 
-At its core, this mechanism involves the interaction between publishers, who disseminate messages, and subscribers, who receive and act upon these messages. By employing this model, systems can leverage the power of loosely coupled communication, enhancing the adaptability of individual components within the broader infrastructure.
+With NotificationCenter, you can seamlessly integrate different pub/sub backends like Kafka, NATS, Redis, PostgreSQL, and more without altering your application logic. This promotes decoupled architectures, enhancing performance, reliability, and scalability.
 
-To streamline the implementation of this messaging paradigm, libraries provide essential foundational elements that facilitate the utilization of various queue implementations. These libraries abstract the complexities of interacting with diverse queuing systems, thereby simplifying the development of pub/sub services. This not only promotes efficient communication between services but also empowers developers to concentrate on the business logic and functionality of their applications without becoming entangled in the intricacies of messaging infrastructures.
+## Table of Contents
 
-- [Using examples](#using-examples)
-  - [Create new publisher processor](#create-new-publisher-processor)
-  - [Send event by the notification publisher](#send-event-by-the-notification-publisher)
-  - [Subscribe by the specific notification publisher](#subscribe-by-the-specific-notification-publisher)
-- Modules
-  - [Kafka](kafka)
-  - [NATS](nats)
-  - [NATS Stream](natstream)
-  - [PostgreSQL](pg)
-  - [Redis](redis)
-  - [Golang Chanels implementation](gochan)
-  - [Golang time interval executor](interval)
+- [Features](#features)
+- [Supported Modules](#supported-modules)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+  - [Import the Package](#import-the-package)
+  - [Create a Publisher](#create-a-publisher)
+  - [Publish Messages](#publish-messages)
+  - [Subscribe to Messages](#subscribe-to-messages)
 - [TODO](#todo)
+- [License](#license)
 
-## Using examples
+## Features
 
-Basic examples of usage.
+- **Unified Interface**: Interact with multiple pub/sub backends using a consistent API.
+- **Easy Integration**: Quickly set up publishers and subscribers with minimal configuration.
+- **Backend Flexibility**: Swap out message brokers without changing your application code.
+- **Event-Driven Architecture**: Facilitate loosely coupled communication between services.
+- **Scalability**: Improve performance and reliability by decoupling application components.
+
+## Supported Modules
+
+- [Kafka](kafka)
+- [NATS](nats)
+- [NATS Streaming](natsstream)
+- [PostgreSQL](pg)
+- [Redis](redis)
+- [Go Channels](gochan)
+- [Time Interval Executor](interval)
+
+## Installation
+
+Install the library using `go get`:
+
+```bash
+go get github.com/geniusrabbit/notificationcenter/v2
+```
+
+## Usage Examples
+
+Below are basic examples demonstrating how to use NotificationCenter in your Go application.
+
+### Import the Package
 
 ```go
-import(
+import (
   nc "github.com/geniusrabbit/notificationcenter/v2"
 )
 ```
 
-### Create new publisher processor
+### Create a Publisher
+
+Create a new publisher using one of the supported backends. For example, using **NATS**:
 
 ```go
-// Create new publisher processor
-eventStream, err = nats.NewPublisher(nats.WithNatsURL("nats://hostname:4222/group?topics=event"))
+import (
+  "github.com/geniusrabbit/notificationcenter/v2/nats"
+  "log"
+)
+
+// Create a new NATS publisher
+eventStream, err := nats.NewPublisher(
+  nats.WithNatsURL("nats://hostname:4222"),
+)
 if err != nil {
   log.Fatal(err)
 }
 
-// Register stream processor
+// Register the publisher with NotificationCenter
 err = nc.Register("events", eventStream)
 if err != nil {
   log.Fatal(err)
 }
 ```
 
-### Send event by the notification publisher
+### Publish Messages
 
-```go
-// Send by global functions
-nc.Publish(context.Background(), "events", message{title: "event 1"})
+You can publish messages using global functions or by obtaining a publisher interface.
 
-// Send by logger interface
-events := nc.Publisher("events")
-events.Publish(context.Background(), message{title: "event 2"})
-```
-
-### Subscribe by the specific notification publisher
+**Using Global Functions:**
 
 ```go
 import (
-  nc "github.com/geniusrabbit/notificationcenter/v2"
+  "context"
+)
+
+// Define your message structure
+type Message struct {
+  Title string
+}
+
+// Publish a message globally
+nc.Publish(context.Background(), "events", Message{Title: "Event 1"})
+```
+
+**Using Publisher Interface:**
+
+```go
+// Get the publisher interface
+eventsPublisher := nc.Publisher("events")
+
+// Publish a message
+eventsPublisher.Publish(context.Background(), Message{Title: "Event 2"})
+```
+
+### Subscribe to Messages
+
+Create a subscriber and register it with NotificationCenter.
+
+```go
+import (
+  "context"
+  "fmt"
+  "github.com/geniusrabbit/notificationcenter/v2"
   "github.com/geniusrabbit/notificationcenter/v2/nats"
+  "github.com/geniusrabbit/notificationcenter/v2/interval"
+  "time"
 )
 
 func main() {
   ctx := context.Background()
-  events := nats.MustNewSubscriber(nats.WithTopics("events"),
-    nats.WithNatsURL("nats://connection"), nats.WithGroupName(`group`))
-  nc.Register("events", events)
-  nc.Register("refresh", interval.NewSubscriber(time.Minute * 5))
 
-  // Add new receiver to process the stream "events"
+  // Create a NATS subscriber
+  eventsSubscriber := nats.MustNewSubscriber(
+    nats.WithTopics("events"),
+    nats.WithNatsURL("nats://hostname:4222"),
+    nats.WithGroupName("group"),
+  )
+  nc.Register("events", eventsSubscriber)
+
+  // Optional: Create a time interval subscriber (e.g., for periodic tasks)
+  refreshSubscriber := interval.NewSubscriber(5 * time.Minute)
+  nc.Register("refresh", refreshSubscriber)
+
+  // Subscribe to the "events" stream
   nc.Subscribe("events", func(msg nc.Message) error {
-    fmt.Printf("%v\n", msg.Data())
+    // Process the received message
+    fmt.Printf("Received message: %v\n", msg.Data())
+
+    // Acknowledge the message if necessary
     return msg.Ack()
   })
 
-  // Add new time interval receiver to refresh the data every 5 minutes
+  // Subscribe to the "refresh" stream for periodic tasks
   nc.Subscribe("refresh", func(msg nc.Message) error {
-    return db.Reload()
+    // Perform your periodic task here
+    fmt.Println("Performing periodic refresh")
+    return msg.Ack()
   })
 
-  // Run subscriber listeners
+  // Start listening for messages
   nc.Listen(ctx)
 }
 ```
 
 ## TODO
 
-- [ ] Add support Amazon SQS queue
-- [X] Add support Redis queue
-- [ ] Add support RabbitMQ queue
-- [ ] Add support MySQL notifications queue
-- [X] Add support PostgreSQL notifications queue
-- [X] ~~Remove metrics from the queue (DEPRECATED)~~
-- [X] Add support NATS & NATS stream
-- [X] Add support kafka queue
-- [X] Add support native GO chanels
-- [X] Add support native GO time interval
+- [ ] Add support for **Amazon SQS**
+- [x] Add support for **Redis** queue
+- [ ] Add support for **RabbitMQ**
+- [ ] Add support for **MySQL notifications**
+- [x] Add support for **PostgreSQL notifications**
+- [x] ~~Remove deprecated metrics from the queue~~
+- [x] Add support for **NATS & NATS Streaming**
+- [x] Add support for **Kafka** queue
+- [x] Add support for native **Go channels**
+- [x] Add support for **Time Interval Execution**
+
+## License
+
+NotificationCenter is licensed under the [Apache 2.0 License](LICENSE).
+
+---
+
+By using NotificationCenter, you can focus on building the core functionality of your application without worrying about the intricacies of different messaging infrastructures. Feel free to contribute to the project or report any issues you encounter.

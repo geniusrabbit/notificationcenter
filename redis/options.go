@@ -103,6 +103,7 @@ func WithRedisURL(urlString string) Option {
 		opt.RedisOptions = &redis.Options{
 			Network:         network,
 			Addr:            u.Host,
+			Username:        u.User.Username(),
 			Password:        password,
 			DB:              dbNum,
 			ClientName:      query.Get("client_name"),
