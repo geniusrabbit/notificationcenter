@@ -11,35 +11,38 @@ on:
     branches:
       - master
       - main
+  workflow_dispatch:
 
 concurrency:
   group: ci-tests-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GOVERSION: 1.23.x
+
 jobs:
   lint:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.22.x
+        go-version: ${{ env.GOVERSION }}
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Run linters
-      uses: golangci/golangci-lint-action@v6
+      uses: golangci/golangci-lint-action@v7
       with:
         version: latest
         skip-cache: true
         args: --fix
 
   test:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
     needs: lint
     strategy:
       matrix:
-        go-version: [1.22.x]
         platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -47,36 +50,34 @@ jobs:
       if: success()
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: ${{ env.GOVERSION }}
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Run tests
       run: go test -v -covermode=count
 
   coverage:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: test
     strategy:
       fail-fast: false
-      matrix:
-        go-version: [1.22.x]
     steps:
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: ${{ env.GOVERSION }}
       - uses: actions/checkout@v4
       - run: go test -v -coverprofile=profile.cov ./...
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: profile.cov
-          flag-name: Go-${{ matrix.go-version }}
+          flag-name: Go-${{ env.GOVERSION }}
           parallel: true
 
   # notifies that all test jobs are finished.
   finish:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
     needs: coverage
     runs-on: ubuntu-latest
     steps:
