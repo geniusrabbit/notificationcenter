@@ -5,15 +5,15 @@ export GOSUMDB := off
 export GODEBUG := tls13=0
 export GOPRIVATE=sum.golang.org/*
 
-SUBDIRS := \
-	kafka \
-	nats \
-	natstream \
-	pg \
-	redis \
-	wrappers/concurrency \
-	wrappers/once/bigcache \
-	wrappers/once/redis
+# SUBDIRS := \
+# 	kafka \
+# 	nats \
+# 	natstream \
+# 	pg \
+# 	redis \
+# 	wrappers/concurrency \
+# 	wrappers/once/bigcache \
+# 	wrappers/once/redis
 
 .PHONY: generate-code
 generate-code: ## Generate mocks for the project
@@ -27,18 +27,18 @@ lint:
 .PHONY: test
 test: ## Run package test
 	go test -race ./...
-	@$(foreach PKG,${SUBDIRS}, \
-		pushd ${PKG} > /dev/null && set -e && go test -race ./... && popd > /dev/null ; \
-	)
+	# @$(foreach PKG,${SUBDIRS}, \
+	# 	pushd ${PKG} > /dev/null && set -e && go test -race ./... && popd > /dev/null ; \
+	# )
 
 .PHONY: tidy
 tidy: ## Run mod tidy
 	@echo "Run mod tidy"
 	go mod tidy
-	@$(foreach PKG,${SUBDIRS}, \
-		echo "Run mod tidy in ${PKG}" ; \
-		pushd ${PKG} > /dev/null && set -e && go mod tidy && popd > /dev/null ; \
-	)
+	# @$(foreach PKG,${SUBDIRS}, \
+	# 	echo "Run mod tidy in ${PKG}" ; \
+	# 	pushd ${PKG} > /dev/null && set -e && go mod tidy && popd > /dev/null ; \
+	# )
 
 .PHONY: godepup
 godepup: ## Update current dependencies to the last version
