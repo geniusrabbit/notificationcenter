@@ -57,10 +57,12 @@ func (r *Registry) Subscriber(name string) Subscriber {
 //
 // Example:
 // ```
-//   nc.Register(
-//     "events", kafka.MustNewSubscriber(),
-//     "notifications", nats.MustNewSubscriber(),
-//   )
+//
+//	nc.Register(
+//	  "events", kafka.MustNewSubscriber(),
+//	  "notifications", nats.MustNewSubscriber(),
+//	)
+//
 // ```
 func (r *Registry) Register(params ...any) error {
 	var name string
@@ -96,7 +98,7 @@ func (r *Registry) Register(params ...any) error {
 func (r *Registry) Publish(ctx context.Context, name string, messages ...any) error {
 	pub := r.Publisher(name)
 	if pub == nil {
-		return errors.Wrapf(ErrUndefinedPublisherInterface, name)
+		return errors.Wrap(ErrUndefinedPublisherInterface, name)
 	}
 	return pub.Publish(ctx, messages...)
 }
@@ -154,13 +156,15 @@ func (r *Registry) Close() error {
 
 // OnClose event will be executed only after closing all interfaces
 //
-// Usecases in the application makes subsribing for the finishing event very convinient
+// # Usecases in the application makes subsribing for the finishing event very convinient
 //
 // ```go
-// func myDatabaseObserver() {
-//   <- notificationcenter.OnClose()
-//   // ... Do something
-// }
+//
+//	func myDatabaseObserver() {
+//	  <- notificationcenter.OnClose()
+//	  // ... Do something
+//	}
+//
 // ```
 func (r *Registry) OnClose() <-chan bool {
 	atomic.AddInt32(&r.closeEventCount, 1)

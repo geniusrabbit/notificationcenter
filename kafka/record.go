@@ -1,19 +1,14 @@
 //
-// @project geniusrabbit.com 2015 – 2016, 2019 – 2022
-// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019 – 2022
+// @project geniusrabbit.com 2015 – 2016, 2019 – 2022, 2025
+// @author Dmitry Ponomarev <demdxx@gmail.com> 2015 – 2016, 2019 – 2022, 2025
 //
 
 package kafka
 
-import "sync"
-
-const minimalMessageSize = 1000
-
-var byteEncoderPool = sync.Pool{
-	New: func() any {
-		return &kafkaByteEncoder{data: make([]byte, 0, minimalMessageSize)}
-	},
-}
+// Note: The encoder is intentionally not pooled to avoid data races with Sarama's
+// asynchronous producer which may continue to read the message value on
+// background goroutines even after a Success notification is delivered.
+// The message value must remain immutable for the lifetime of the ProducerMessage.
 
 type kafkaByteEncoder struct {
 	data []byte
@@ -28,12 +23,12 @@ func (k *kafkaByteEncoder) Length() int {
 }
 
 func (k *kafkaByteEncoder) Release() {
-	k.data = k.data[:0]
-	byteEncoderPool.Put(k)
+	// no-op: keep data immutable and let GC reclaim memory when no longer referenced
 }
 
 func byteEncoder(data []byte) *kafkaByteEncoder {
-	byteEncoder := byteEncoderPool.New().(*kafkaByteEncoder)
-	byteEncoder.data = append(byteEncoder.data, data...)
-	return byteEncoder
+	// Copy data to ensure immutability and avoid sharing underlying array
+	cp := make([]byte, len(data))
+	copy(cp, data)
+	return &kafkaByteEncoder{data: cp}
 }

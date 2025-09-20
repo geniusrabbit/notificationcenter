@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GOVERSION: 1.23.x
+  GOVERSION: 1.24.x
 
 jobs:
   lint:
@@ -30,9 +30,9 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Run linters
-      uses: golangci/golangci-lint-action@v7
+      uses: golangci/golangci-lint-action@v8
       with:
         version: latest
         skip-cache: true
@@ -52,7 +52,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Run tests
       run: go test -v -covermode=count
 
@@ -60,13 +60,11 @@ jobs:
     if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: test
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GOVERSION }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: go test -v -coverprofile=profile.cov ./...
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1

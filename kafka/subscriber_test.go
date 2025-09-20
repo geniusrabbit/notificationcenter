@@ -26,6 +26,7 @@ func TestSubscriberReceiveMessages(t *testing.T) {
 	}
 
 	broker0.SetHandlerByMap(map[string]sarama.MockResponse{
+		"ApiVersionsRequest": sarama.NewMockApiVersionsResponse(t),
 		"MetadataRequest": sarama.NewMockMetadataResponse(t).
 			SetBroker(broker0.Addr(), broker0.BrokerID()).
 			SetLeader(testTopicName, 0, broker0.BrokerID()),
